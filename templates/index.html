@@ -6,10 +6,24 @@
 
 
     {% if current_user.is_authenticated %}
-
-    <h1>Welcome {{ current_user.username }}</h1>
-    <a href="{{url_for('logout')}}">Logout</a>
-
+         {% if current_user.username == 'cquintans' %}
+            <h1>Welcome Carlos</h1>
+            <hr>
+            <div>
+                <a href="http://127.0.0.1:5000/status">Replication Status</a><br>
+                <a href="http://127.0.0.1:5000/start">Replication Start</a><br>
+                <a href="http://127.0.0.1:5000/stop">Replication Stop</a><br>
+            </div>
+            <hr>
+            <a href="{{url_for('logout')}}">Logout</a>
+         {% else %}
+            <h1>Welcome {{ current_user.username }}</h1>
+            <hr>
+            <a href="/mypasswords">my Passwords</a><br>
+            <a href="/assets/create">Add an Asset</a>
+            <hr>
+            <a href="{{url_for('logout')}}">Logout</a>
+        {% endif %}
     {% else %}
 
     <a href="{{url_for('login')}}">Sign in/Sign Up</a>
