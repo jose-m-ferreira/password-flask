@@ -1,4 +1,4 @@
-# FrascoDePasswords
+# password-flask
 
 ## Set up & Installation.
 
@@ -63,13 +63,7 @@ set FLASK_APP=routes
 flask run
 ```
 
-Login           |  Register
-:-------------------------:|:-------------------------:
-![Sample](https://github.com/Dev-Elie/User-Authentication-in-Flask/blob/main/static/login.png)  |  ![Sample](https://github.com/Dev-Elie/User-Authentication-in-Flask/blob/main/static/register.png)
 
-</br>
-<div align="center"><h1>Follow me on Twitter</h1></div>
-<p align="center"> <a href="https://twitter.com/dev_elie" target="blank"><img src="https://img.shields.io/twitter/follow/dev_elie?logo=twitter&style=for-the-badge" alt="dev_elie" /></a> </p>
 
 
 
