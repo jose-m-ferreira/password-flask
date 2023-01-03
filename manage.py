@@ -2,8 +2,8 @@
 def deploy():
 	"""Run deployment tasks."""
 	from app import create_app, db
-	from flask_migrate import upgrade,migrate,init,stamp
-	from models import User
+	from flask_migrate import upgrade,migrate,init,stamp, Migrate
+	from models import User, Groups, Asset
 
 	app = create_app()
 	app.app_context().push()
@@ -16,4 +16,3 @@ def deploy():
 	upgrade()
 	
 deploy()
-	

@@ -6,14 +6,9 @@
 
 
     {% if current_user.is_authenticated %}
-         {% if current_user.username == 'cquintans' %}
-            <h1>Welcome Carlos</h1>
+         {% if current_user.username == 'something' %}
+            <h1>Welcome something</h1>
             <hr>
-            <div>
-                <a href="http://127.0.0.1:5000/status">Replication Status</a><br>
-                <a href="http://127.0.0.1:5000/start">Replication Start</a><br>
-                <a href="http://127.0.0.1:5000/stop">Replication Stop</a><br>
-            </div>
             <hr>
             <a href="{{url_for('logout')}}">Logout</a>
          {% else %}
@@ -21,6 +16,25 @@
             <hr>
             <a href="/mypasswords">my Passwords</a><br>
             <a href="/assets/create">Add an Asset</a>
+                {% if 1 in current_user.usergroupid.split(',') | map('int') | list %}
+                <hr>
+                      Welcome Password Admin
+                <div>
+                    <tr>Manage Groups</tr>
+                    <div>
+                        <td><a href="/groups">List Groups</a></td>
+                        <td><a href="/groups/create">Create a Group</a></td>
+                    </div>
+                </div>
+    <br>
+                <div>
+                    <tr>Manage Users</tr>
+                    <div>
+                        <td><a href="/users">List Users</a></td>
+                    </div>
+                </div>
+                {% endif %}
+
             <hr>
             <a href="{{url_for('logout')}}">Logout</a>
         {% endif %}

@@ -45,11 +45,13 @@ app = create_app()
 @app.before_request
 def session_handler():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=1)
+    app.permanent_session_lifetime = timedelta(minutes=5)
 
 
 @app.route("/", methods=("GET", "POST"), strict_slashes=False)
+@login_required
 def index():
+    #print(type(current_user.usergroupid))
     return render_template("index.html",title="Home")
 
 
@@ -215,7 +217,7 @@ def update(id):
 
 
 #Let's manage users
-#lets list useres
+#lets list users
 @app.route('/users')
 @login_required
 def retrieve_user_list():
