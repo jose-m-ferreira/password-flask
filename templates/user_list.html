@@ -1,3 +1,20 @@
+<table align="center" border 1 >
+    <thead>
+    <tr>
+        <th class="User ID">User ID</th>
+        <th class="User Name">Username</th>
+        <th class="email">eMail</th>
+        <th class="usergroupid">User Groups List</th>
+        <th class="Update">Update</th>
+    </tr>
+    </thead>
 {% for user in users %}
-<h3>{{user}}</h3><hr>
+    <tr>
+        <td class="User ID">{{user.id}}</td>
+        <td class="User Name">{{user.username}}</td>
+        <td class="email">{{user.email}}</td>
+        <td class="usergroupid">{{user.usergroupid}}</td>
+        <td class="Update"><a  href="/users/{{user.id}}/userupdate">Edit User</a></td>
+    </tr>
 {% endfor %}
+</table>

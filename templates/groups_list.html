@@ -1,3 +1,16 @@
+<table align="center" border 1 >
+    <thead>
+    <tr>
+        <th class="Group ID">Group ID</th>
+        <th class="Group Name">Group Name</th>
+        <th class="Update">Update</th>
+    </tr>
+    </thead>
 {% for group in groups %}
-<h3>{{group}}</h3><hr>
+    <tr>
+        <td class="Group ID">{{group.id}}</td>
+        <td class="Group Name">{{group.groupname}}</td>
+        <td class="Update"><a  href="/groups/{{group.id}}/groupupdate">Edit Group</a></td>
+    </tr>
 {% endfor %}
+</table>
