@@ -1,14 +1,29 @@
-<TABLE BORDER=1>
+<TABLE BORDER=1 ALIGN="CENTER">
 <CAPTION>Asset {{asset.id}}</caption>
+        <thead>
+    <tr>
+        <th class="Asset ID">Asset ID</th>
+        <th class="Asset Name">Asset Name</th>
+        <th class="Asset Description">Asset Description</th>
+        <th class="Asset IPAddress">Asset IPAddress</th>
+        <th class="Asset User">Asset User</th>
+        <th class="Asset Password">Asset Password</th>
+        <th class="Asset Permited User Ids">Asset Permited User Ids</th>
+        <th class="Asset Permited Group Ids">Asset Permited Group Ids</th>
+        <th class="Asset Update"></th>
+    </tr>
+    </thead>
 <TR>
-<TD WIDTH=10>{{asset.id}}</td>
-<TD WIDTH="15%">{{asset.assetname}}</td>
-<TD WIDTH="15%">{{asset.assetdescription}}</td>
-<TD WIDTH="15%">{{asset.assetipaddress}}</td>
-<TD WIDTH="15%">{{asset.assetuser}}</td>
-<TD WIDTH="15%">{{asset.assetpwd}}</td>
-<TD WIDTH="15%">{{asset.permiteduserid}}</td>
-<TD WIDTH="15%">{{asset.permitedgroupid}}</td>
+<TD class="Asset ID">{{asset.id}}</td>
+<TD class="Asset Name">{{asset.assetname}}</td>
+<TD class="Asset Description">{{asset.assetdescription}}</td>
+<TD class="Asset IPAddress">{{asset.assetipaddress}}</td>
+<TD class="Asset User">{{asset.assetuser}}</td>
+<TD class="Asset Password">{{asset.assetpwd}}</td>
+<TD class="Asset Permited User Ids">{{asset.permiteduserid}}</td>
+<TD class="Asset Permited Group Ids">{{asset.permitedgroupid}}</td>
+<td class="Update"><a  href="/assets/{{asset.id}}/assetupdate">Edit Asset</a></td>
 </tr>
+
 </table>
 

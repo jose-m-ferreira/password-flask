@@ -38,13 +38,4 @@ class Asset(db.Model):
     permiteduserid = db.Column(db.String(300), nullable=True, unique=False)
     permitedgroupid = db.Column(db.String(300), nullable=False, unique=False)
 
-#    def __init__(self):
-#        self.id = id
-#        self.assetname = assetname
-#        self.assetdescription = assetdescription
-#        self.assetipaddress = assetipaddress
-#        self.assetuser = assetuser
-#        self.assetpwd = assetpwd
-#
-    #def __repr__(self):
-    #    return 'Asset Name %r' % self.assetname + ' Asset Description %r' % self.assetdescription + ' Asset IP %r' % self.assetipaddress + ' Asset User %r' % self.assetuser + ' Asset Password %r' % self.assetpwd
+#class rsa(db.Model):

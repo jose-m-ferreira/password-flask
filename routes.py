@@ -31,10 +31,13 @@ from flask_login import (
     login_required,
 )
 
-from app import create_app,db,login_manager,bcrypt
+from app import create_app,db,login_manager,bcrypt,rsa
 from models import User, Groups, Asset
 from forms import login_form,register_form
+from rsa_key_management import loadSecrets
 
+
+privateKey, publicKey = loadSecrets()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -167,8 +170,8 @@ def mypasswords():
         #remove duplicates from each list
         user_assets = list(dict.fromkeys(user_assets))
         user_group_assets = list(dict.fromkeys(user_group_assets))
-        print(user_assets)
-        print(user_group_assets)
+        #print(user_assets)
+        #print(user_group_assets)
 
         #return f"UserID: {userid} <br> UserGroupId: {userGroupId} <br> User Assets: {user_assets} <br> Group Assets: {user_group_assets}"
         return render_template('mypasswords.html', user_assets=user_assets, user_group_assets=user_group_assets)
@@ -309,15 +312,22 @@ def create_asset():
         assetdescription = request.form['assetdescription']
         assetipaddress = request.form['assetipaddress']
         assetuser = request.form['assetuser']
-        assetpwd = request.form['assetpwd']
+        assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
         permiteduserid = request.form['permiteduserid']
+        if not permiteduserid:
+            permiteduserid = current_user.id
         permitedgroupid = request.form['permitedgroupid']
 
         asset = Asset(assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
                       permitedgroupid=permitedgroupid)
-        db.session.add(asset)
-        db.session.commit()
+        try:
+            db.session.add(asset)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash(f"Asset already exists!.", "warning")
+
         return redirect('/assets')
 
 
@@ -327,6 +337,7 @@ def create_asset():
 def RetrieveSingleAsset(id):
     asset = Asset.query.filter_by(id=id).first()
     if asset:
+        asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
         return render_template('asset.html', asset=asset)
     return f"Asset with id ={id} Doenst exist"
 
@@ -345,7 +356,7 @@ def updateasset(id):
             assetdescription = request.form['assetdescription']
             assetipaddress = request.form['assetipaddress']
             assetuser = request.form['assetuser']
-            assetpwd = request.form['assetpwd']
+            assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
             permiteduserid = request.form['permiteduserid']
             permitedgroupid = request.form['permitedgroupid']
 
