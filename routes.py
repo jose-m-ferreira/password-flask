@@ -138,26 +138,42 @@ def mypasswords():
     if current_user.is_authenticated:
         user = current_user.username
         userid = current_user.id
-        userGroupId = current_user.usergroupid
+        userGroupId = list(map(int,current_user.usergroupid.split(',')))
+
         all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid).all()
-        #print(userid)
+        #print(userid, userGroupId)
         #print(all_assets)
         user_assets = []
         for i in range(0, len(all_assets)):
             #print(f"{all_assets[i][5]} - {all_assets[i]}")
-            if str(userid) in str(all_assets[i][5]) :
-                #print(all_assets[i])
-                user_assets.append(all_assets[i])
+            #print(f"all_assets: {all_assets[i][5]}")
+            if all_assets[i][5]:
+                asset_permited_users = list(map(int, all_assets[i][5].split(',')))
+                #print(f"asset_permited_users: {asset_permited_users}")
+                if userid in (list(map(int, all_assets[i][5].split(',')))):
+                    #print(all_assets[i])
+                    user_assets.append(all_assets[i])
         user_group_assets = []
         for i in range(0, len(all_assets)):
-            #print(f"{all_assets[i][5]} - {all_assets[i]}")
-            if str(userGroupId) in str(all_assets[i][6]):
-                #print(all_assets[i])
-                user_group_assets.append(all_assets[i])
+            #print(f"{all_assets[i][6]} - {all_assets[i]}")
+            #print(f"list of permited user group ids: {list(map(int, all_assets[i][6].split(',')))}")
+            #print(f"list of user group ids: {userGroupId}")
+            #if any(userGroupId) in any((list(map(int, all_assets[i][6].split(','))))):
+            for ugid in userGroupId:
+                if ugid in list(map(int, all_assets[i][6].split(','))):
+                    #print(all_assets[i])
+                    user_group_assets.append(all_assets[i])
 
-        return f"UserID: {userid} <br> UserGroupId: {userGroupId} <br> User Assets: {user_assets} <br> Group Assets: {user_group_assets}"
+        #remove duplicates from each list
+        user_assets = list(dict.fromkeys(user_assets))
+        user_group_assets = list(dict.fromkeys(user_group_assets))
+        print(user_assets)
+        print(user_group_assets)
 
-
+        #return f"UserID: {userid} <br> UserGroupId: {userGroupId} <br> User Assets: {user_assets} <br> Group Assets: {user_group_assets}"
+        return render_template('mypasswords.html', user_assets=user_assets, user_group_assets=user_group_assets)
+    else:
+        return f"Error"
 # lets manage groups
 # create a new group
 @app.route('/groups/create', methods=['GET', 'POST'])
