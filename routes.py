@@ -163,19 +163,21 @@ def mypasswords():
 @app.route('/groups/create', methods=['GET', 'POST'])
 @login_required
 def create():
-    if request.method == 'GET':
-        return render_template('creategroup.html')
+    if current_user.is_authenticated and 1 in list(map(int, current_user.usergroupid.split(','))):
+        if request.method == 'GET':
+            return render_template('creategroup.html')
 
-    if request.method == 'POST':
-        #id = request.form['id']
-        groupname = request.form['groupname']
+        if request.method == 'POST':
+            #id = request.form['id']
+            groupname = request.form['groupname']
 
-        #group = Groups(id=id, groupname=groupname)
-        group = Groups(groupname=groupname)
-        db.session.add(group)
-        db.session.commit()
-        return redirect('/groups')
-
+            #group = Groups(id=id, groupname=groupname)
+            group = Groups(groupname=groupname)
+            db.session.add(group)
+            db.session.commit()
+            return redirect('/groups')
+    else:
+        return f"User not an admin"
 
 #list the groups
 @app.route('/groups')
@@ -199,22 +201,25 @@ def RetrieveSingleGroup(id):
 @app.route('/groups/<int:id>/groupupdate', methods=['GET', 'POST'])
 @login_required
 def update(id):
-    group = Groups.query.filter_by(id=id).first()
-    if request.method == 'POST':
-        if group:
-            db.session.delete(group)
-            db.session.commit()
+    if current_user.is_authenticated and 1 in list(map(int, current_user.usergroupid.split(','))):
 
-            groupname = request.form['groupname']
-            group = Groups(id=id, groupname=groupname)
-            db.session.add(group)
-            db.session.commit()
-            return redirect(f'/groups/{id}')
-        else:
-            return f"Group with id = {id} Does not exist"
+        group = Groups.query.filter_by(id=id).first()
+        if request.method == 'POST':
+            if group:
+                db.session.delete(group)
+                db.session.commit()
 
-    return render_template('groupupdate.html', group=group)
+                groupname = request.form['groupname']
+                group = Groups(id=id, groupname=groupname)
+                db.session.add(group)
+                db.session.commit()
+                return redirect(f'/groups/{id}')
+            else:
+                return f"Group with id = {id} Does not exist"
 
+        return render_template('groupupdate.html', group=group)
+    else:
+        return f"User not an admin"
 
 #Let's manage users
 #lets list users
@@ -240,29 +245,31 @@ def retrieve_single_user(id):
 @app.route('/users/<int:id>/userupdate', methods=['GET', 'POST'])
 @login_required
 def updateuser(id):
-    user = User.query.filter_by(id=id).first()
-    if request.method == 'POST':
-        if user:
-            #we don't want to change password so let's get it:
-            user_password = User.query.filter_by(id=id).with_entities(User.pwd).first()
-            user_password = user_password[0]
+    if current_user.is_authenticated and 1 in list(map(int, current_user.usergroupid.split(','))):
+        user = User.query.filter_by(id=id).first()
+        if request.method == 'POST':
+            if user:
+                #we don't want to change password so let's get it:
+                user_password = User.query.filter_by(id=id).with_entities(User.pwd).first()
+                user_password = user_password[0]
 
-            db.session.delete(user)
-            db.session.commit()
+                db.session.delete(user)
+                db.session.commit()
 
-            username = request.form['username']
-            email = request.form['email']
-            usergroupid = request.form['usergroupid']
-            user = User(id=id, username=username, email=email, usergroupid=usergroupid, pwd=user_password)
+                username = request.form['username']
+                email = request.form['email']
+                usergroupid = request.form['usergroupid']
+                user = User(id=id, username=username, email=email, usergroupid=usergroupid, pwd=user_password)
 
-            db.session.add(user)
-            db.session.commit()
-            return redirect(f'/users/{id}')
-        else:
-            return f"User with id = {id} Does not exist"
+                db.session.add(user)
+                db.session.commit()
+                return redirect(f'/users/{id}')
+            else:
+                return f"User with id = {id} Does not exist"
 
-    return render_template('userupdate.html', user=user)
-
+        return render_template('userupdate.html', user=user)
+    else:
+        return f"User with id ={id} Does not exist"
 
 # lets manage assets
 #list the assets
