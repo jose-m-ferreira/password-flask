@@ -2,3 +2,5 @@
 *.db
 /venv-pc/
 /venv/
+/private.pem
+/public.pem
