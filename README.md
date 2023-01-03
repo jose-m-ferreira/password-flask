@@ -7,8 +7,8 @@
 **Windows**
           
 ```bash
-git clone https://github.com/Dev-Elie/User-Authentication-in-Flask.git
-cd User-Authentication-in-Flask
+git clone https://github.com/josemiguelferreiraorg/password-flask.git
+cd password-flask
 py -3 -m venv venv
 
 ```
@@ -16,8 +16,8 @@ py -3 -m venv venv
 **macOS/Linux**
           
 ```bash
-git clone https://github.com/Dev-Elie/User-Authentication-in-Flask.git
-cd User-Authentication-in-Flask
+git clone https://github.com/josemiguelferreiraorg/password-flask.git
+cd password-flask
 python3 -m venv venv
 
 ```
