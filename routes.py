@@ -32,7 +32,7 @@ from flask_login import (
 )
 
 from app import create_app,db,login_manager,bcrypt,rsa
-from models import User, Groups, Asset
+from models import User, Groups, Asset, ITServices
 from forms import login_form,register_form
 from rsa_key_management import loadSecrets
 
@@ -55,7 +55,8 @@ def session_handler():
 @login_required
 def index():
     #print(type(current_user.usergroupid))
-    return render_template("index.html",title="Home")
+    itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+    return render_template("index.html",title="Home", itservices=itservices)
 
 
 @app.route("/login/", methods=("GET", "POST"), strict_slashes=False)
@@ -174,9 +175,13 @@ def mypasswords():
         #print(user_group_assets)
 
         #return f"UserID: {userid} <br> UserGroupId: {userGroupId} <br> User Assets: {user_assets} <br> Group Assets: {user_group_assets}"
-        return render_template('mypasswords.html', user_assets=user_assets, user_group_assets=user_group_assets)
+        itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+        return render_template('mypasswords.html', user_assets=user_assets, user_group_assets=user_group_assets, itservices=itservices)
     else:
         return f"Error"
+
+
+
 # lets manage groups
 # create a new group
 @app.route('/groups/create', methods=['GET', 'POST'])
@@ -184,7 +189,8 @@ def mypasswords():
 def create():
     if current_user.is_authenticated and 1 in list(map(int, current_user.usergroupid.split(','))):
         if request.method == 'GET':
-            return render_template('creategroup.html')
+            itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+            return render_template('creategroup.html', itservices=itservices)
 
         if request.method == 'POST':
             #id = request.form['id']
@@ -203,7 +209,8 @@ def create():
 @login_required
 def RetrieveGroupList():
     groups = Groups.query.with_entities(Groups.id, Groups.groupname)
-    return render_template('groups_list.html', groups=groups)
+    itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+    return render_template('groups_list.html', groups=groups, itservices=itservices)
 
 
 #list individual groups
@@ -212,7 +219,8 @@ def RetrieveGroupList():
 def RetrieveSingleGroup(id):
     group = Groups.query.filter_by(id=id).first()
     if group:
-        return render_template('group.html', group=group)
+        itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+        return render_template('group.html', group=group, itservices=itservices)
     return f"Employee with id ={id} Doenst exist"
 
 
@@ -235,8 +243,8 @@ def update(id):
                 return redirect(f'/groups/{id}')
             else:
                 return f"Group with id = {id} Does not exist"
-
-        return render_template('groupupdate.html', group=group)
+        itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+        return render_template('groupupdate.html', group=group, itservices=itservices)
     else:
         return f"User not an admin"
 
@@ -246,7 +254,8 @@ def update(id):
 @login_required
 def retrieve_user_list():
     users = User.query.with_entities(User.id, User.username, User.email, User.usergroupid)
-    return render_template('user_list.html', users=users)
+    itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+    return render_template('user_list.html', users=users, itservices=itservices)
 
 
 #list individual users
@@ -256,7 +265,8 @@ def retrieve_single_user(id):
     user = User.query.filter_by(id=id).first()
     #print(user.id, user.username, user.email, user.usergroupid)
     if user:
-        return render_template('user.html', user=user)
+        itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+        return render_template('user.html', user=user, itservices=itservices)
     return f"User with id ={id} Does not exist"
 
 
@@ -285,8 +295,8 @@ def updateuser(id):
                 return redirect(f'/users/{id}')
             else:
                 return f"User with id = {id} Does not exist"
-
-        return render_template('userupdate.html', user=user)
+        itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+        return render_template('userupdate.html', user=user, itservices=itservices)
     else:
         return f"User with id ={id} Does not exist"
 
@@ -296,7 +306,8 @@ def updateuser(id):
 @login_required
 def RetrieveAssetList():
     assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetdescription, Asset.assetipaddress,  Asset.permiteduserid, Asset.permitedgroupid, Asset.assetItService)
-    return render_template('assets_list.html', assets=assets)
+    itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+    return render_template('assets_list.html', assets=assets, itservices=itservices)
 
 
 # create a new asset
@@ -304,7 +315,8 @@ def RetrieveAssetList():
 @login_required
 def create_asset():
     if request.method == 'GET':
-        return render_template('createasset.html')
+        itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+        return render_template('createasset.html', itservices=itservices)
 
     if request.method == 'POST':
         #id = request.form['id']
@@ -348,10 +360,12 @@ def RetrieveSingleAsset(id):
         asset = Asset.query.filter_by(id=id).first()
         if asset:
             asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
-            return render_template('asset.html', asset=asset)
+            itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+            return render_template('asset.html', asset=asset, itservices=itservices)
         return f"Asset with id ={id} Doenst exist"
     else:
         return f"No permissions to view asset with id = {id}"
+
 
 #update the assets
 @app.route('/assets/<int:id>/assetupdate', methods=['GET', 'POST'])
@@ -389,9 +403,11 @@ def updateasset(id):
                 return redirect(f'/assets/{id}')
             else:
                 return f"Asset with id = {id} Does not exist"
-        return render_template('assetupdate.html', asset=asset)
+        itservices = ITServices.query.with_entities(ITServices.itservicename).all()
+        return render_template('assetupdate.html', asset=asset, itservices=itservices)
     else:
         return f"No permissions to edit asset with id = {id}"
+
 
 #delete the asset
 @app.route('/assets/<int:id>/delete', methods=['GET'])
@@ -417,6 +433,7 @@ def deleteasset(id):
         return redirect('/assets')
     else:
         return f"No permissions to delete asset with id: {id}"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
