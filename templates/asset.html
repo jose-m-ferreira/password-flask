@@ -1,5 +1,11 @@
-<TABLE BORDER=1 ALIGN="CENTER">
-<CAPTION>Asset {{asset.id}}</caption>
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+{% block content%}
+
+<div class="container py-4 text-center" >
+
+<TABLE align="center" border 1 id="assets">
+
         <thead>
     <tr>
         <th class="Asset ID">Asset ID</th>
@@ -10,6 +16,7 @@
         <th class="Asset Password">Asset Password</th>
         <th class="Asset Permited User Ids">Asset Permited User Ids</th>
         <th class="Asset Permited Group Ids">Asset Permited Group Ids</th>
+        <th class="Asset IT Service">Asset ITService</th>
         <th class="Asset Update"></th>
     </tr>
     </thead>
@@ -22,8 +29,10 @@
 <TD class="Asset Password">{{asset.assetpwd}}</td>
 <TD class="Asset Permited User Ids">{{asset.permiteduserid}}</td>
 <TD class="Asset Permited Group Ids">{{asset.permitedgroupid}}</td>
+<TD class="Asset Permited Group Ids">{{asset.assetItService}}</td>
 <td class="Update"><a  href="/assets/{{asset.id}}/assetupdate">Edit Asset</a></td>
 </tr>
 
 </table>
-
+    </div>
+{% endblock %}

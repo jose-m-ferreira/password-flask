@@ -295,7 +295,7 @@ def updateuser(id):
 @app.route('/assets')
 @login_required
 def RetrieveAssetList():
-    assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetdescription, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid)
+    assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetdescription, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid, Asset.assetItService)
     return render_template('assets_list.html', assets=assets)
 
 
@@ -317,6 +317,7 @@ def create_asset():
         if not permiteduserid:
             permiteduserid = current_user.id
         permitedgroupid = request.form['permitedgroupid']
+        assetItService = request.form['assetItService']
 
         asset = Asset(assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
@@ -347,6 +348,7 @@ def RetrieveSingleAsset(id):
 @login_required
 def updateasset(id):
     asset = Asset.query.filter_by(id=id).first()
+    asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
     if request.method == 'POST':
         if asset:
             db.session.delete(asset)
@@ -359,10 +361,11 @@ def updateasset(id):
             assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
             permiteduserid = request.form['permiteduserid']
             permitedgroupid = request.form['permitedgroupid']
+            assetItService = request.form['assetItService']
 
             asset = Asset(id=id, assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
-                      permitedgroupid = permitedgroupid)
+                      permitedgroupid=permitedgroupid, assetItService=assetItService)
 
             db.session.add(asset)
             db.session.commit()

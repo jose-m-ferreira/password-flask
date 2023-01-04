@@ -1,3 +1,8 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+{% block content%}
+
+<div class="container py-4 text-center">
 <form action='' method = "POST">
   <p>Asset Name <input type = "text" name = "assetname" value="{{asset.assetname}}"/></p>
   <p>Asset Description <input type = "text" name = "assetdescription" value="{{asset.assetdescription}}"/></p>
@@ -6,5 +11,8 @@
    <p>Asset Password <input type = "text" name = "assetpwd" value="{{asset.assetpwd}}"/></p>
    <p>Asset Permited User Id List <input type = "text" name = "permiteduserid" value="{{asset.permiteduserid}}"/></p>
    <p>Asset Permited Group Id List <input type = "text" name = "permitedgroupid" value="{{asset.permitedgroupid}}"/></p>
+    <p>Asset IT Service<input type = "text" name = "permitedgroupid" value="{{asset.assetItService}}"/></p>
   <p><input type = "submit" value = "Submit" /></p>
 </form>
+    </div>
+{% endblock %}

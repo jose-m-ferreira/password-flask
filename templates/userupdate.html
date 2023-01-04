@@ -1,6 +1,14 @@
+{% extends "base.html" %}
+{% block title%} {{ title }}
+{% endblock %}
+{% block content%}
+
+<div class="container py-4 text-center">
 <form action='' method = "POST">
   <p>User Name <input type = "text" name = "username" value="{{user.username}}"/></p>
   <p>eMail<input type = "text" name = "email" value="{{user.email}}"/></p>
   <p>Group(s) Id(s)<input type = "text" name = "usergroupid" value="{{user.usergroupid}}"/></p>
   <p><input type = "submit" value = "Submit" /></p>
 </form>
+    </div>
+{% endblock %}

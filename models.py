@@ -37,5 +37,6 @@ class Asset(db.Model):
     assetpwd = db.Column(db.String(300), nullable=False, unique=False)
     permiteduserid = db.Column(db.String(300), nullable=True, unique=False)
     permitedgroupid = db.Column(db.String(300), nullable=False, unique=False)
+    assetItService = db.Column(db.String(120), unique=False, nullable=True)
 
 #class rsa(db.Model):
