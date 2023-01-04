@@ -10,6 +10,36 @@
     <!-- Sweet alert Js -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title> {% block title%} {{ title }} {% endblock %} </title>
+    <!-- format our tables -->
+
+    <style>
+    #assets {
+      font-family: Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: auto;
+    }
+
+    #assets td, #assets th {
+      border: 1px solid #ddd;
+      padding: 8px;
+      white-space: nowrap;
+    }
+
+    #assets tr:nth-child(even){background-color: #f2f2f2;}
+
+    #assets tr:hover {background-color: #ddd;}
+
+    #assets th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #04AA6D;
+      color: white;
+      white-space: nowrap;
+    }
+    </style>
+
 </head>
 
 <body>

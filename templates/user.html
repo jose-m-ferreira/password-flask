@@ -1,4 +1,9 @@
-<TABLE BORDER=1>
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+{% block content%}
+
+<div class="container py-4 text-center">
+<TABLE BORDER=1 id="assets">
 <TR>
 <TD WIDTH="5%">User ID</td>
 <TD WIDTH="15%">User Name</td>
@@ -11,4 +16,5 @@
 <TD WIDTH="35%">{{user.usergroupid}}</td>
 </tr>
 </table>
-
+    </div>
+{% endblock %}
