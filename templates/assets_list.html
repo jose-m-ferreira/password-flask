@@ -11,12 +11,9 @@
         <th class="Asset Name">Asset Name</th>
         <th class="Asset Description">Asset Description</th>
         <th class="Asset IPAddress">Asset IPAddress</th>
-        <th class="Asset User">Asset User</th>
-        <th class="Asset Password">Asset Password</th>
         <th class="Asset Permited User Ids">Users</th>
         <th class="Asset Permited Group Ids">Groups</th>
         <th class="Asset IT Service">IT Service</th>
-        <th class="Asset Update">Update</th>
     </tr>
     </thead>
 {% for asset in assets %}
@@ -25,12 +22,9 @@
         <td class="Asset Name">{{asset.assetname}}</td>
         <td class="Asset Description">{{asset.assetdescription}}</td>
         <td class="Asset IPAddress">{{asset.assetipaddress}}</td>
-        <td class="Asset User">{{asset.assetuser}}</td>
-        <td class="Asset Password"><a  href="/assets/{{asset.id}}">Show Pass</a></td>
         <td class="Asset Permited User Ids">{{asset.permiteduserid}}</td>
         <td class="Asset Permited Group Ids">{{asset.permitedgroupid}}</td>
         <td class="Asset Permited Group Ids">{{asset.assetItService}}</td>
-        <td class="Update"><a  href="/assets/{{asset.id}}/assetupdate">Edit Asset</a></td>
     </tr>
 {% endfor %}
 </table>

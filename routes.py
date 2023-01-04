@@ -295,7 +295,7 @@ def updateuser(id):
 @app.route('/assets')
 @login_required
 def RetrieveAssetList():
-    assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetdescription, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid, Asset.assetItService)
+    assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetdescription, Asset.assetipaddress,  Asset.permiteduserid, Asset.permitedgroupid, Asset.assetItService)
     return render_template('assets_list.html', assets=assets)
 
 
@@ -336,60 +336,87 @@ def create_asset():
 @app.route('/assets/<int:id>')
 @login_required
 def RetrieveSingleAsset(id):
-    asset = Asset.query.filter_by(id=id).first()
-    if asset:
-        asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
-        return render_template('asset.html', asset=asset)
-    return f"Asset with id ={id} Doenst exist"
+    userid = current_user.id
+    userGroupId = list(map(int, current_user.usergroupid.split(',')))
 
+    asset_permited_users = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
+    asset_permited_groups = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
+
+    if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
+        #print(f"either userid {userid} or group {userGroupId} matched {asset_permited_users} or {asset_permited_groups}")
+
+        asset = Asset.query.filter_by(id=id).first()
+        if asset:
+            asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
+            return render_template('asset.html', asset=asset)
+        return f"Asset with id ={id} Doenst exist"
+    else:
+        return f"No permissions to view asset with id = {id}"
 
 #update the assets
 @app.route('/assets/<int:id>/assetupdate', methods=['GET', 'POST'])
 @login_required
 def updateasset(id):
-    asset = Asset.query.filter_by(id=id).first()
-    asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
-    if request.method == 'POST':
-        if asset:
-            db.session.delete(asset)
-            db.session.commit()
+    userid = current_user.id
+    userGroupId = list(map(int, current_user.usergroupid.split(',')))
 
-            assetname = request.form['assetname']
-            assetdescription = request.form['assetdescription']
-            assetipaddress = request.form['assetipaddress']
-            assetuser = request.form['assetuser']
-            assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
-            permiteduserid = request.form['permiteduserid']
-            permitedgroupid = request.form['permitedgroupid']
-            assetItService = request.form['assetItService']
+    asset_permited_users = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
+    asset_permited_groups = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
 
-            asset = Asset(id=id, assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
+    if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
+        asset = Asset.query.filter_by(id=id).first()
+        asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
+        if request.method == 'POST':
+            if asset:
+                db.session.delete(asset)
+                db.session.commit()
+
+                assetname = request.form['assetname']
+                assetdescription = request.form['assetdescription']
+                assetipaddress = request.form['assetipaddress']
+                assetuser = request.form['assetuser']
+                assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
+                permiteduserid = request.form['permiteduserid']
+                permitedgroupid = request.form['permitedgroupid']
+                assetItService = request.form['assetItService']
+
+                asset = Asset(id=id, assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
                       permitedgroupid=permitedgroupid, assetItService=assetItService)
 
-            db.session.add(asset)
-            db.session.commit()
-            return redirect(f'/assets/{id}')
-        else:
-            return f"Asset with id = {id} Does not exist"
-
-    return render_template('assetupdate.html', asset=asset)
-
+                db.session.add(asset)
+                db.session.commit()
+                return redirect(f'/assets/{id}')
+            else:
+                return f"Asset with id = {id} Does not exist"
+        return render_template('assetupdate.html', asset=asset)
+    else:
+        return f"No permissions to edit asset with id = {id}"
 
 #delete the asset
 @app.route('/assets/<int:id>/delete', methods=['GET'])
 @login_required
 def deleteasset(id):
-    asset = Asset.query.filter_by(id=id).first()
-    if request.method == 'GET':
-        if asset:
-            db.session.delete(asset)
-            db.session.commit()
-        else:
-            return f"Asset with id = {id} Does not exist"
+    userid = current_user.id
+    userGroupId = list(map(int, current_user.usergroupid.split(',')))
 
-    return redirect('/assets')
+    asset_permited_users = list(
+        map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
+    asset_permited_groups = list(
+        map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
 
+    if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
+        asset = Asset.query.filter_by(id=id).first()
+        if request.method == 'GET':
+            if asset:
+                db.session.delete(asset)
+                db.session.commit()
+            else:
+                return f"Asset with id = {id} Does not exist"
+
+        return redirect('/assets')
+    else:
+        return f"No permissions to delete asset with id: {id}"
 
 if __name__ == "__main__":
     app.run(debug=True)
