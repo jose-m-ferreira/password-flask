@@ -2,5 +2,8 @@
 *.db
 /venv-pc/
 /venv/
+/mac-venv/
 /private.pem
 /public.pem
+/migrations/
+/migrations/

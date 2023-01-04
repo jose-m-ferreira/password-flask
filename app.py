@@ -12,6 +12,8 @@ from flask_login import (
     login_required,
 )
 
+#import models
+
 login_manager = LoginManager()
 login_manager.session_protection = "strong"
 login_manager.login_view = "login"
@@ -21,6 +23,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 bcrypt = Bcrypt()
 rsa = rsa
+
 
 def create_app():
     app = Flask(__name__)

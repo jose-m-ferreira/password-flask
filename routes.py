@@ -35,9 +35,13 @@ from app import create_app,db,login_manager,bcrypt,rsa
 from models import User, Groups, Asset, ITServices
 from forms import login_form,register_form
 from rsa_key_management import loadSecrets
+from load_groups import insert_group_data
 
-
+#lets load our keys for encryption
 privateKey, publicKey = loadSecrets()
+
+#lets make sure we have the admin groups setup
+insert_group_data()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -91,11 +95,13 @@ def register():
             email = form.email.data
             pwd = form.pwd.data
             username = form.username.data
-            
+
+            #new users go into the general group so that they can login
             newuser = User(
                 username=username,
                 email=email,
                 pwd=bcrypt.generate_password_hash(pwd),
+                usergroupid='2'
             )
     
             db.session.add(newuser)

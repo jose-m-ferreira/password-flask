@@ -14,5 +14,8 @@ def deploy():
 	stamp()
 	migrate()
 	upgrade()
-	
+
+
+
 deploy()
+
