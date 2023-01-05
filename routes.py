@@ -32,7 +32,7 @@ from flask_login import (
 )
 
 from app import create_app,db,login_manager,bcrypt,rsa
-from models import User, Groups, Asset, ITServices
+from models import User, Groups, Asset, AssetGroups
 from forms import login_form,register_form,self_update_form
 from rsa_key_management import loadSecrets
 from load_groups import insert_group_data
@@ -56,8 +56,8 @@ def session_handler():
 @login_required
 def index():
     #print(type(current_user.usergroupid))
-    itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-    return render_template("index.html",title="Home", itservices=itservices)
+    assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+    return render_template("index.html",title="Home", assetgroups=assetgroups)
 
 
 @app.route("/login/", methods=("GET", "POST"), strict_slashes=False)
@@ -177,15 +177,15 @@ def mypasswords():
         #print(user_group_assets)
 
         #return f"UserID: {userid} <br> UserGroupId: {userGroupId} <br> User Assets: {user_assets} <br> Group Assets: {user_group_assets}"
-        itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-        return render_template('mypasswords.html', user_assets=user_assets, user_group_assets=user_group_assets, itservices=itservices)
+        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+        return render_template('mypasswords.html', user_assets=user_assets, user_group_assets=user_group_assets, assetgroups=assetgroups)
     else:
         return f"Error"
 
 
 @app.route("/mypasswords/<int:id>")
 @login_required
-def mypasswords_itservices(id):
+def mypasswords_assetgroups(id):
     if current_user.is_authenticated:
         user = current_user.username
         userid = current_user.id
@@ -222,8 +222,8 @@ def mypasswords_itservices(id):
         #print(user_group_assets)
 
         #return f"UserID: {userid} <br> UserGroupId: {userGroupId} <br> User Assets: {user_assets} <br> Group Assets: {user_group_assets}"
-        itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-        return render_template('mypasswords.html', user_assets=user_assets, user_group_assets=user_group_assets, itservices=itservices)
+        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+        return render_template('mypasswords.html', user_assets=user_assets, user_group_assets=user_group_assets, assetgroups=assetgroups)
     else:
         return f"Error"
 
@@ -235,8 +235,8 @@ def mypasswords_itservices(id):
 def create():
     if current_user.is_authenticated and 1 in list(map(int, current_user.usergroupid.split(','))):
         if request.method == 'GET':
-            itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-            return render_template('creategroup.html', itservices=itservices)
+            assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+            return render_template('creategroup.html', assetgroups=assetgroups)
 
         if request.method == 'POST':
             #id = request.form['id']
@@ -255,8 +255,8 @@ def create():
 @login_required
 def RetrieveGroupList():
     groups = Groups.query.with_entities(Groups.id, Groups.groupname)
-    itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-    return render_template('groups_list.html', groups=groups, itservices=itservices)
+    assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+    return render_template('groups_list.html', groups=groups, assetgroups=assetgroups)
 
 
 #list individual groups
@@ -265,8 +265,8 @@ def RetrieveGroupList():
 def RetrieveSingleGroup(id):
     group = Groups.query.filter_by(id=id).first()
     if group:
-        itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-        return render_template('group.html', group=group, itservices=itservices)
+        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+        return render_template('group.html', group=group, assetgroups=assetgroups)
     return f"Employee with id ={id} Doenst exist"
 
 
@@ -289,8 +289,8 @@ def update(id):
                 return redirect(f'/groups/{id}')
             else:
                 return f"Group with id = {id} Does not exist"
-        itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-        return render_template('groupupdate.html', group=group, itservices=itservices)
+        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+        return render_template('groupupdate.html', group=group, assetgroups=assetgroups)
     else:
         return f"User not an admin"
 
@@ -300,8 +300,8 @@ def update(id):
 @login_required
 def retrieve_user_list():
     users = User.query.with_entities(User.id, User.username, User.email, User.usergroupid)
-    itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-    return render_template('user_list.html', users=users, itservices=itservices)
+    assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+    return render_template('user_list.html', users=users, assetgroups=assetgroups)
 
 
 #list individual users
@@ -311,8 +311,8 @@ def retrieve_single_user(id):
     user = User.query.filter_by(id=id).first()
     #print(user.id, user.username, user.email, user.usergroupid)
     if user:
-        itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-        return render_template('user.html', user=user, itservices=itservices)
+        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+        return render_template('user.html', user=user, assetgroups=assetgroups)
     return f"User with id ={id} Does not exist"
 
 
@@ -341,8 +341,8 @@ def updateuser(id):
                 return redirect(f'/users/{id}')
             else:
                 return f"User with id = {id} Does not exist"
-        itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-        return render_template('userupdate.html', user=user, itservices=itservices)
+        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+        return render_template('userupdate.html', user=user, assetgroups=assetgroups)
     else:
         return f"User with id ={id} Does not exist"
 
@@ -389,13 +389,13 @@ def selfupdateuser():
             db.session.rollback()
             flash(f"An error occured !", "danger")
 
-    itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
+    assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
     return render_template("selfupdate.html",
                                form=form,
                                text="Save account",
                                title="Save",
                                btn_action="Submit",
-                               itservices=itservices,
+                               assetgroups=assetgroups,
                                user=user
                                )
 
@@ -408,8 +408,8 @@ def selfupdateuser():
 @login_required
 def RetrieveAssetList():
     assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetdescription, Asset.assetipaddress,  Asset.permiteduserid, Asset.permitedgroupid, Asset.assetItService)
-    itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-    return render_template('assets_list.html', assets=assets, itservices=itservices)
+    assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+    return render_template('assets_list.html', assets=assets, assetgroups=assetgroups)
 
 
 # create a new asset
@@ -417,8 +417,8 @@ def RetrieveAssetList():
 @login_required
 def create_asset():
     if request.method == 'GET':
-        itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-        return render_template('createasset.html', itservices=itservices)
+        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+        return render_template('createasset.html', assetgroups=assetgroups)
 
     if request.method == 'POST':
         #id = request.form['id']
@@ -462,8 +462,8 @@ def RetrieveSingleAsset(id):
         asset = Asset.query.filter_by(id=id).first()
         if asset:
             asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
-            itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-            return render_template('asset.html', asset=asset, itservices=itservices)
+            assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+            return render_template('asset.html', asset=asset, assetgroups=assetgroups)
         return f"Asset with id ={id} Doenst exist"
     else:
         return f"No permissions to view asset with id = {id}"
@@ -505,8 +505,8 @@ def updateasset(id):
                 return redirect(f'/assets/{id}')
             else:
                 return f"Asset with id = {id} Does not exist"
-        itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
-        return render_template('assetupdate.html', asset=asset, itservices=itservices)
+        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+        return render_template('assetupdate.html', asset=asset, assetgroups=assetgroups)
     else:
         return f"No permissions to edit asset with id = {id}"
 

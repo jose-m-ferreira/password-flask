@@ -39,11 +39,11 @@ class Asset(db.Model):
     permitedgroupid = db.Column(db.String(300), nullable=False, unique=False)
     assetItService = db.Column(db.String(120), unique=False, nullable=True)
 
-class ITServices(db.Model):
-    __tablename__ = "itservices"
+class AssetGroups(db.Model):
+    __tablename__ = "assetgroups"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    itservicename = db.Column(db.String(80), unique=True, nullable=False)
+    assetgroupname = db.Column(db.String(80), unique=True, nullable=False)
 
     def __repr__(self):
-        return f"{self.itservicename}"
+        return f"{self.assetgroupname}"
