@@ -33,10 +33,11 @@ from flask_login import (
 
 from app import create_app,db,login_manager,bcrypt,rsa
 from models import User, Groups, Asset, ITServices
-from forms import login_form,register_form
+from forms import login_form,register_form,self_update_form
 from rsa_key_management import loadSecrets
+from load_groups import insert_group_data
 
-
+insert_group_data()
 privateKey, publicKey = loadSecrets()
 
 @login_manager.user_loader
@@ -96,6 +97,7 @@ def register():
                 username=username,
                 email=email,
                 pwd=bcrypt.generate_password_hash(pwd),
+                usergroupid='2'
             )
     
             db.session.add(newuser)
@@ -343,6 +345,67 @@ def updateuser(id):
         return render_template('userupdate.html', user=user, itservices=itservices)
     else:
         return f"User with id ={id} Does not exist"
+
+
+# user settings update
+@app.route('/users/selfupdate', methods=['GET', 'POST'], strict_slashes=False)
+@login_required
+def selfupdateuser():
+    form = self_update_form()
+    id = current_user.id
+    user = User.query.filter_by(id=id).first()
+    username = user.username
+    email = user.email
+    pwd = user.pwd
+    usergroupid = user.usergroupid
+    if form.validate_on_submit():
+        try:
+            db.session.delete(user)
+            db.session.commit()
+
+            email = form.email.data
+            pwd = bcrypt.generate_password_hash(form.pwd.data)
+            usergroupid = usergroupid
+            if not usergroupid:
+                usergroupid = '2'
+            id = id
+
+            user = User(id=id, username=username, email=email, pwd=pwd, usergroupid=usergroupid)
+            db.session.add(user)
+            db.session.commit()
+            flash(f"Account Succesfully updated, please login again", "success")
+            return redirect("/logout")
+        except InvalidRequestError:
+            db.session.rollback()
+            flash(f"Something went wrong!", "danger")
+        except IntegrityError:
+            db.session.rollback()
+            flash(f"User already exists!.", "warning")
+        except DataError:
+            db.session.rollback()
+            flash(f"Invalid Entry", "warning")
+        except InterfaceError:
+            db.session.rollback()
+            flash(f"Error connecting to the database", "danger")
+        except DatabaseError:
+            db.session.rollback()
+            flash(f"Error connecting to the database", "danger")
+        except BuildError:
+            db.session.rollback()
+            flash(f"An error occured !", "danger")
+
+    itservices = ITServices.query.with_entities(ITServices.id, ITServices.itservicename).all()
+    return render_template("selfupdate.html",
+                               form=form,
+                               text="Save account",
+                               title="Save",
+                               btn_action="Submit",
+                               itservices=itservices,
+                               user=user
+                               )
+
+
+
 
 # lets manage assets
 #list the assets

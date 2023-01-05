@@ -54,3 +54,16 @@ class register_form(FlaskForm):
     def validate_uname(self, uname):
         if User.query.filter_by(username=username.data).first():
             raise ValidationError("Username already taken!")
+
+class self_update_form(FlaskForm):
+    username = StringField(validators=[Optional()])
+    email = StringField(validators=[InputRequired(), Email(), Length(1, 64)])
+    pwd = PasswordField(validators=[InputRequired(), Length(8, 72)])
+    cpwd = PasswordField(
+        validators=[
+            InputRequired(),
+            Length(8, 72),
+            EqualTo("pwd", message="Passwords must match !"),
+        ]
+    )
+
