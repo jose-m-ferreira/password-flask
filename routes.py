@@ -33,7 +33,7 @@ from flask_login import (
 
 from app import create_app,db,login_manager,bcrypt,rsa
 from models import User, Groups, Asset, AssetGroups
-from forms import login_form,register_form,self_update_form
+from forms import login_form, register_form, self_update_form, search_form
 from rsa_key_management import loadSecrets
 from load_groups import insert_group_data
 
@@ -536,6 +536,45 @@ def deleteasset(id):
     else:
         return f"No permissions to delete asset with id: {id}"
 
+
+#search for assets
+@app.route('/search/<string:search_item>', methods=['GET'])
+@login_required
+def search(search_item):
+    form = search_form()
+    if current_user.is_authenticated:
+        user = current_user.username
+        userid = current_user.id
+        userGroupId = list(map(int, current_user.usergroupid.split(',')))
+
+        all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser,
+                                               Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid).all()
+
+        user_assets = []
+        for i in range(0, len(all_assets)):
+            if all_assets[i][5]:
+                asset_permited_users = list(map(int, all_assets[i][5].split(',')))
+                if userid in (list(map(int, all_assets[i][5].split(',')))):
+                    user_assets.append(all_assets[i])
+        user_group_assets = []
+        for i in range(0, len(all_assets)):
+            for ugid in userGroupId:
+                if ugid in list(map(int, all_assets[i][6].split(','))):
+                    # print(all_assets[i])
+                    user_group_assets.append(all_assets[i])
+
+        user_assets = list(dict.fromkeys(user_assets))
+        user_group_assets = list(dict.fromkeys(user_group_assets))
+        assets = user_assets.extend(user_group_assets)
+        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+        if assets:
+            return render_template('assets_list.html', form=form, assets=assets, assetgroups=assetgroups)
+        else:
+            #print(assets)
+            flash(f"No Assets found for {search_item}", "search_empty_result")
+            return render_template('search.html', form=form, assetsgroups=assetgroups)
+    else:
+        return f"Error"
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "mypassword_base.html" %}
 {% block title%} {{ title }} {% endblock %}
 {% block content%}
 <div class="container">
@@ -19,42 +19,26 @@
                 {% endif %}
                 {% endwith %}
 
-                <div class="text-center">
-                    <h2>Password Flask</h2>
-                    <h5 class="text-primary">{{ text }}</h5>
+                <div class="text-right">
+                    <h5>Search for Assets</h5>
+                    <br>
                 </div>
-                
-                {% if request.path == '/register/' %}
-                <div class="form-group mb-3">
-                    {{ form.username(class_="form-control",placeholder="Username")}}
-                </div>
-                {% for error in form.username.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
+
+                {% if request.path == '/search/search_item' %}
+
                 {% endif%}
+                <!--
                 <div class="form-group mb-3">
-                    {{ form.email(class_="form-control",placeholder="Email")}}
-                </div>
-                {% for error in form.email.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor%}
-                <div class="form-group mb-3">
-                    {{ form.pwd(class_="form-control",placeholder="Password")}}
+                    {{ form.pwd(class_="form-control",placeholder="New Password") }}
                 </div>
                 {% for error in form.pwd.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     {{ error }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div> {% endfor%}
-                {% if request.path == '/register/' %}
+                {% if request.path == '/users/selfupdate' %}
                 <div class="form-group mb-3">
-                    {{ form.cpwd(class_="form-control",placeholder="Confirm Password")}}
+                    {{ form.cpwd(class_="form-control",placeholder="Confirm New Password")}}
                 </div>
                 {% for error in form.cpwd.errors %}
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -63,21 +47,10 @@
                 </div> {% endfor%}
                 {% endif %}
                 <div class="text-center">
-
+                -->
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-block btn-primary mb-3"> {{ btn_action }} </button>
                     </div>
-
-                    <p>
-                        {% if request.path != '/register/' %}
-                        New here?
-                        <a href="{{url_for('register')}}">Create account</a>
-                        {% else %}
-                        Already have an account?
-                        <a href="{{url_for('login')}}">Login</a>
-                        {% endif %}
-                    </p>
-                    
                 </div>
             </form>
         </div>

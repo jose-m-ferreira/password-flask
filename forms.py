@@ -67,3 +67,8 @@ class self_update_form(FlaskForm):
         ]
     )
 
+
+class search_form(FlaskForm):
+    search_item = StringField(validators=[InputRequired(), Length(2, 300)])
+
+
