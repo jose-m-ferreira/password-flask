@@ -363,12 +363,7 @@ def selfupdateuser():
             db.session.delete(user)
             db.session.commit()
 
-            email = form.email.data
             pwd = bcrypt.generate_password_hash(form.pwd.data)
-            usergroupid = usergroupid
-            if not usergroupid:
-                usergroupid = '2'
-            id = id
 
             user = User(id=id, username=username, email=email, pwd=pwd, usergroupid=usergroupid)
             db.session.add(user)

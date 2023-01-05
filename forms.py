@@ -57,7 +57,7 @@ class register_form(FlaskForm):
 
 class self_update_form(FlaskForm):
     username = StringField(validators=[Optional()])
-    email = StringField(validators=[InputRequired(), Email(), Length(1, 64)])
+    email = StringField(validators=[Optional(), Email(), Length(1, 64)])
     pwd = PasswordField(validators=[InputRequired(), Length(8, 72)])
     cpwd = PasswordField(
         validators=[
