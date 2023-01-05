@@ -41,7 +41,7 @@ from load_groups import insert_group_data
 privateKey, publicKey = loadSecrets()
 
 #lets make sure we have the admin groups setup
-insert_group_data()
+insert_group_data = insert_group_data()
 
 @login_manager.user_loader
 def load_user(user_id):
