@@ -8,7 +8,7 @@ from wtforms import (
 )
 
 from flask_wtf import FlaskForm
-from wtforms.validators import InputRequired, Length, EqualTo, Email, Regexp ,Optional
+from wtforms.validators import InputRequired, Length, EqualTo, Email, Regexp ,Optional, DataRequired
 import email_validator
 from flask_login import current_user
 from wtforms import ValidationError,validators
@@ -69,6 +69,6 @@ class self_update_form(FlaskForm):
 
 
 class search_form(FlaskForm):
-    search_item = StringField(validators=[InputRequired(), Length(2, 300)])
+    search_item = StringField(validators=[InputRequired(), Length(2, 30), ])
 
 

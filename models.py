@@ -28,6 +28,7 @@ class Groups(db.Model):
 
 class Asset(db.Model):
     __tablename__ = "assets"
+    __searchable__=['assetname', 'assetdescription', 'assetipaddress', 'assetItService']
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     assetname = db.Column(db.String(80), unique=True, nullable=False)

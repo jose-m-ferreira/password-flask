@@ -24,30 +24,22 @@
                     <br>
                 </div>
 
-                {% if request.path == '/search/search_item' %}
+                {% if request.path == '/search' %}
 
+                <div class="form-group mb-3">
+                    {{ form.search_item(class_="form-control",placeholder="string search") }}
+                </div>
+                {% for error in form.search_item.errors %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div> {% endfor%}
                 {% endif%}
-                <!--
-                <div class="form-group mb-3">
-                    {{ form.pwd(class_="form-control",placeholder="New Password") }}
-                </div>
-                {% for error in form.pwd.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div> {% endfor%}
-                {% if request.path == '/users/selfupdate' %}
-                <div class="form-group mb-3">
-                    {{ form.cpwd(class_="form-control",placeholder="Confirm New Password")}}
-                </div>
-                {% for error in form.cpwd.errors %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div> {% endfor%}
+                {% if request.path == '/search' %}
+
                 {% endif %}
                 <div class="text-center">
-                -->
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-block btn-primary mb-3"> {{ btn_action }} </button>
                     </div>

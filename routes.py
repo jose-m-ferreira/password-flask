@@ -173,7 +173,7 @@ def mypasswords():
         #remove duplicates from each list
         user_assets = list(dict.fromkeys(user_assets))
         user_group_assets = list(dict.fromkeys(user_group_assets))
-        #print(user_assets)
+        #print(f"search results: {user_assets, type(user_assets)}")
         #print(user_group_assets)
 
         #return f"UserID: {userid} <br> UserGroupId: {userGroupId} <br> User Assets: {user_assets} <br> Group Assets: {user_group_assets}"
@@ -401,7 +401,6 @@ def selfupdateuser():
 
 
 
-
 # lets manage assets
 #list the assets
 @app.route('/assets')
@@ -536,19 +535,27 @@ def deleteasset(id):
     else:
         return f"No permissions to delete asset with id: {id}"
 
+#list the searched assets
+@app.route("/search_results/<query>", methods=['GET', 'POST'])
+@login_required
+def search_results(query):
+
+
+       #assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid).all()
+
+    assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+    return render_template('search_result.html', assets=query, assetgroups=assetgroups)
+
 
 #search for assets
-@app.route('/search/<string:search_item>', methods=['GET'])
+@app.route('/search', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
-def search(search_item):
-    form = search_form()
+def search():
     if current_user.is_authenticated:
         user = current_user.username
         userid = current_user.id
         userGroupId = list(map(int, current_user.usergroupid.split(',')))
-
-        all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser,
-                                               Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid).all()
+        all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid).all()
 
         user_assets = []
         for i in range(0, len(all_assets)):
@@ -556,6 +563,7 @@ def search(search_item):
                 asset_permited_users = list(map(int, all_assets[i][5].split(',')))
                 if userid in (list(map(int, all_assets[i][5].split(',')))):
                     user_assets.append(all_assets[i])
+
         user_group_assets = []
         for i in range(0, len(all_assets)):
             for ugid in userGroupId:
@@ -563,18 +571,54 @@ def search(search_item):
                     # print(all_assets[i])
                     user_group_assets.append(all_assets[i])
 
+
+
         user_assets = list(dict.fromkeys(user_assets))
         user_group_assets = list(dict.fromkeys(user_group_assets))
-        assets = user_assets.extend(user_group_assets)
-        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-        if assets:
-            return render_template('assets_list.html', form=form, assets=assets, assetgroups=assetgroups)
-        else:
-            #print(assets)
-            flash(f"No Assets found for {search_item}", "search_empty_result")
-            return render_template('search.html', form=form, assetsgroups=assetgroups)
-    else:
-        return f"Error"
+
+        all_assets = user_assets + user_group_assets
+        form = search_form()
+        #print(f"all_assets: {all_assets} - {type(all_assets)}")
+        if form.validate_on_submit():
+            try:
+                search_item = form.search_item.data
+                if not all_assets:
+                    flash(f"No Assets found for {search_item}", "search_empty_result")
+                    return render_template("search.html", form=form, text="Search Assets", title="Search Assets",
+                                           btn_action="Search Assets")
+
+                else:
+                    search_results = []
+                    for item in list(all_assets):
+                        #print(f"item: {item, type(item)}")
+                        for sub_item in list(item):
+                            #print(f"{search_item} - {sub_item, type(sub_item)}")
+                            if search_item in str(sub_item):
+                                search_results.append(item)
+                    #print(f"search_results: {search_results}")
+                    if search_results:
+                        search_results = list(dict.fromkeys(search_results))
+                        print(f"search results: {search_results, type(search_results)}")
+
+                        return redirect((url_for('search_results', query=search_results)))
+
+
+                    else:
+                        flash(f"No Assets found for {search_item}", "search_empty_result")
+                        return render_template("search.html", form=form, text="Search Assets", title="Search Assets",
+                                               btn_action="Search Assets")
+
+            except:
+                return render_template("search.html", form=form, text="Search Assets", title="Search Assets",
+                                       btn_action="Search Assets")
+        print('form did not validate on submit')
+    return render_template("search.html", form=form, text="Search Assets", title="Search Assets",
+                           btn_action="Search Assets")
+
+
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
