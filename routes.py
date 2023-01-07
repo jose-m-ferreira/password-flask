@@ -456,7 +456,10 @@ def RetrieveSingleAsset(id):
     userGroupId = list(map(int, current_user.usergroupid.split(',')))
 
     asset_permited_users = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
-    asset_permited_groups = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
+    asset_permited_groups_result = Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid).all()
+
+    if len (asset_permited_groups_result) > 1:
+        asset_permited_groups = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
 
     if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
         #print(f"either userid {userid} or group {userGroupId} matched {asset_permited_users} or {asset_permited_groups}")
