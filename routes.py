@@ -162,13 +162,15 @@ def mypasswords():
         user_group_assets = []
         for i in range(0, len(all_assets)):
             #print(f"{all_assets[i][6]} - {all_assets[i]}")
-            #print(f"list of permited user group ids: {list(map(int, all_assets[i][6].split(',')))}")
-            #print(f"list of user group ids: {userGroupId}")
+
+            print(f"list of user groupids user belongs to: {userGroupId}")
+            print(f"Asset permited user group ids: {len(all_assets[i][6].split(','))}")
             #if any(userGroupId) in any((list(map(int, all_assets[i][6].split(','))))):
-            for ugid in userGroupId:
-                if ugid in list(map(int, all_assets[i][6].split(','))):
-                    #print(all_assets[i])
-                    user_group_assets.append(all_assets[i])
+            if len(all_assets[i][6].split(',')) > 1:
+                for ugid in userGroupId:
+                    if ugid in list(map(int, all_assets[i][6].split(','))):
+                        #print(all_assets[i])
+                        user_group_assets.append(all_assets[i])
 
         #remove duplicates from each list
         user_assets = list(dict.fromkeys(user_assets))
