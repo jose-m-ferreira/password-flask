@@ -13,7 +13,7 @@
         <th class="Asset IPAddress">Asset IPAddress</th>
         <th class="Asset Permited User Ids">Users</th>
         <th class="Asset Permited Group Ids">Groups</th>
-        <th class="Asset IT Service">IT Service</th>
+        <th class="Asset Groups Ids">Asset Groups</th>
     </tr>
     </thead>
 {% for asset in assets %}
@@ -24,7 +24,7 @@
         <td class="Asset IPAddress">{{asset.assetipaddress}}</td>
         <td class="Asset Permited User Ids">{{asset.permiteduserid}}</td>
         <td class="Asset Permited Group Ids">{{asset.permitedgroupid}}</td>
-        <td class="Asset Permited Group Ids">{{asset.assetItService}}</td>
+        <td class="Asset Groups Ids">{{asset.assetgroups}}</td>
     </tr>
 {% endfor %}
 </table>

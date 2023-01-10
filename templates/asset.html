@@ -16,7 +16,7 @@
         <th class="Asset Password">Asset Password</th>
         <th class="Asset Permited User Ids">Asset Permited User Ids</th>
         <th class="Asset Permited Group Ids">Asset Permited Group Ids</th>
-        <th class="Asset IT Service">Asset ITService</th>
+        <th class="Asset Asset Groups">Asset Groups</th>
         <th class="Asset Update"></th>
     </tr>
     </thead>
@@ -27,12 +27,55 @@
 <TD class="Asset IPAddress">{{asset.assetipaddress}}</td>
 <TD class="Asset User">{{asset.assetuser}}</td>
 <TD class="Asset Password">{{asset.assetpwd}}</td>
-<TD class="Asset Permited User Ids">{{asset.permiteduserid}}</td>
-<TD class="Asset Permited Group Ids">{{asset.permitedgroupid}}</td>
-<TD class="Asset Permited Group Ids">{{asset.assetItService}}</td>
+<TD class="Asset Permited User Ids">
+
+        <!-- Trigger/Open The Modal -->
+        <button id="myBtn">Permited Users</button>
+
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+
+          <!-- Modal content -->
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>{{asset.permiteduserid}}</p>
+          </div>
+        </div>
+</td>
+<TD class="Asset Permited Group Ids">
+
+        <!-- Trigger/Open The Modal -->
+        <button id="myPermitedGroupsBtn">Permited Groups</button>
+
+        <!-- The Modal -->
+        <div id="myPermitedGroupsModal" class="modal">
+
+          <!-- Modal content -->
+          <div class="modal-content">
+            <span class="myPermitedGroupsClose">&times;</span>
+            <p>{{asset.permitedgroupid}}</p>
+          </div>
+        </div>
+</td>
+<TD class="Asset Asset Groups">
+        <!-- Trigger/Open The Modal -->
+        <button id="myAssetGroupsBtn">Asset Groups</button>
+
+        <!-- The Modal -->
+        <div id="myAssetGroupsModal" class="modal">
+
+          <!-- Modal content -->
+          <div class="modal-content">
+            <span class="myAssetGroupsClose">&times;</span>
+            <p>{{asset.assetgroups}}</p>
+          </div>
+        </div>
+</td>
 <td class="Update"><a  href="/assets/{{asset.id}}/assetupdate">Edit Asset</a></td>
 </tr>
 
 </table>
     </div>
+
 {% endblock %}
+

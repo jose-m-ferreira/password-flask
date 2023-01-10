@@ -28,7 +28,7 @@ class Groups(db.Model):
 
 class Asset(db.Model):
     __tablename__ = "assets"
-    __searchable__=['assetname', 'assetdescription', 'assetipaddress', 'assetItService']
+    __searchable__=['assetname', 'assetdescription', 'assetipaddress', 'assetgroups']
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     assetname = db.Column(db.String(80), unique=True, nullable=False)
@@ -38,7 +38,7 @@ class Asset(db.Model):
     assetpwd = db.Column(db.String(300), nullable=False, unique=False)
     permiteduserid = db.Column(db.String(300), nullable=True, unique=False)
     permitedgroupid = db.Column(db.String(300), nullable=False, unique=False)
-    assetItService = db.Column(db.String(120), unique=False, nullable=True)
+    assetgroups = db.Column(db.String(120), unique=False, nullable=True)
 
 class AssetGroups(db.Model):
     __tablename__ = "assetgroups"

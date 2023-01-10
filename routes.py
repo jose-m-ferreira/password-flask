@@ -408,7 +408,7 @@ def selfupdateuser():
 @login_required
 def RetrieveAssetList():
     if current_user.is_authenticated and 1 in list(map(int, current_user.usergroupid.split(','))):
-        assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetdescription, Asset.assetipaddress,  Asset.permiteduserid, Asset.permitedgroupid, Asset.assetItService)
+        assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetdescription, Asset.assetipaddress,  Asset.permiteduserid, Asset.permitedgroupid, Asset.assetgroups)
         assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
         return render_template('assets_list.html', assets=assets, assetgroups=assetgroups)
     return f"not an admin"
@@ -433,7 +433,7 @@ def create_asset():
         if not permiteduserid:
             permiteduserid = current_user.id
         permitedgroupid = request.form['permitedgroupid']
-        assetItService = request.form['assetItService']
+        assetgroups = request.form['assetgroups']
 
         asset = Asset(assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
@@ -449,7 +449,7 @@ def create_asset():
 
 
 #list individual assets
-@app.route('/assets/<int:id>')
+@app.route('/assets/<int:id>', methods=['GET', 'POST'])
 @login_required
 def RetrieveSingleAsset(id):
     userid = current_user.id
@@ -499,11 +499,11 @@ def updateasset(id):
                 assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
                 permiteduserid = request.form['permiteduserid']
                 permitedgroupid = request.form['permitedgroupid']
-                assetItService = request.form['assetItService']
+                assetgroups = request.form['assetgroups']
 
                 asset = Asset(id=id, assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
-                      permitedgroupid=permitedgroupid, assetItService=assetItService)
+                      permitedgroupid=permitedgroupid, assetgroups=assetgroups)
 
                 db.session.add(asset)
                 db.session.commit()
@@ -546,7 +546,7 @@ def deleteasset(id):
 @login_required
 def show_search_results(query):
 
-    #query=[(1, 'srvbackup', '10.11.0.7', 'admwks', b'h\xa4\xa6\x07\xd3\xe0\x08\xdc\xe9g\x0f\xed\xdd\xd6d<\x0c\xb9\x81N`\xea+L\x1c\xc3\x99\xfb!\xe1\x03\xab\x01\x12.\xce\x191gP\xc0\xfc\x8c\xe7u\x7f\xdd\x14\xf9q\xb5H\x1d\x05\x9f8!\x1f}\xaf\x84X \xe7', '1', '2')]
+    
 
     assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
     return render_template('search_result.html', assets=query, assetgroups=assetgroups)
@@ -603,8 +603,8 @@ def search():
                     #print(f"search_results: {search_results}")
                     if search_results:
                         search_results = list(dict.fromkeys(search_results))
-                        print(f"search results: {search_results, type(search_results)}")
-                        print(f"search_results[0]: {search_results[0], type(search_results[0])}")
+                        #print(f"search results: {search_results, type(search_results)}")
+                        #print(f"search_results[0]: {search_results[0], type(search_results[0])}")
                         #return redirect((url_for('search_results', query=search_results)))
                         # list the searched assets
                         return show_search_results(search_results)
@@ -616,7 +616,7 @@ def search():
             except:
                 return render_template("search.html", form=form, text="Search Assets", title="Search Assets",
                                        btn_action="Search Assets")
-        print('form did not validate on submit')
+        #print('form did not validate on submit')
     return render_template("search.html", form=form, text="Search Assets", title="Search Assets",
                            btn_action="Search Assets")
 
