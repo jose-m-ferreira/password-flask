@@ -38,8 +38,21 @@
           <!-- Modal content -->
           <div class="modal-content">
             <span class="close">&times;</span>
-            <p>{{asset.permiteduserid}}</p>
-          </div>
+              <div class="container py-4 text-center" >
+                  <TABLE align="center" border 1 id="assets">
+                    <thead>
+                    <tr>
+                        <th class="Asset User"><center>Asset Users</center></th>
+                    </tr>
+                    </thead>
+                    {% for asset_permited_user in asset_permited_users %}
+                    <TR>
+	                    <TD class="Asset User">{{asset_permited_user}}</td>
+                    </TR>
+                    {% endfor %}
+                </TABLE>
+              </div>
+                </div>
         </div>
 </td>
 <TD class="Asset Permited Group Ids">
@@ -53,7 +66,20 @@
           <!-- Modal content -->
           <div class="modal-content">
             <span class="myPermitedGroupsClose">&times;</span>
-            <p>{{asset.permitedgroupid}}</p>
+              <div class="container py-4 text-center" >
+                  <TABLE align="center" border 1 id="assets">
+                    <thead>
+                    <tr>
+                        <th class="Asset User Group"><center>Asset User Groups Name</center></th>
+                    </tr>
+                    </thead>
+                    {% for assetusergroup in asset_permited_groups %}
+                    <TR>
+	                    <TD class="Asset Group">{{assetusergroup}}</td>
+                    </TR>
+                    {% endfor %}
+                </TABLE>
+              </div>
           </div>
         </div>
 </td>
@@ -80,7 +106,7 @@
                     </TR>
                     {% endfor %}
                 </TABLE>
-          </div>
+              </div>
         </div>
 </td>
 <td class="Update"><a  href="/assets/{{asset.id}}/assetupdate">Edit Asset</a></td>

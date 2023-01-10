@@ -40,6 +40,52 @@ def asset_group_list(asset_group_ids):
         return asset_group_list
     else:
         return asset_groups_ids
+
+def asset_permited_group_list(asset_permited_group_ids):
+    if asset_permited_group_ids:
+        from models import Groups
+        Groups()
+
+        asset_permited_group_ids = list(map(int, asset_permited_group_ids.split(',')))
+        print(f"asset_permited_group_ids: {asset_permited_group_ids}")
+        asset_permited_group_list = []
+        for permited_group in asset_permited_group_ids:
+            asset_permited_group_list.append(Groups.query.filter_by(id=permited_group).with_entities(Groups.groupname).all()[0][0])
+        return asset_permited_group_list
+    else:
+        return asset_permited_group_ids
+
+def asset_permited_user_list(asset_permited_user_ids):
+    if asset_permited_user_ids:
+        from models import User
+        User()
+
+        asset_permited_user_ids = list(map(int, asset_permited_user_ids.split(',')))
+
+        asset_permited_user_list = []
+        for permited_user in asset_permited_user_ids:
+            asset_permited_user_list.append(
+                User.query.filter_by(id=permited_user).with_entities(User.username).all()[0][0])
+        return asset_permited_user_list
+    else:
+        return asset_permited_user_ids
+
+def return_assets_in_assetgroup(assetgroupid, assetgrouplist):
+    #print(f"assetgroupid, assetgrouplist: {assetgroupid, assetgrouplist}")
+    return_assets_in_assetgroup = []
+    if assetgrouplist and assetgroupid:
+        for asset in assetgrouplist:
+            if asset[7]:
+                asset_list = list(map(int, asset[7].split(',')))
+
+                print(f"asset_list: {asset_list}")
+                if assetgroupid in asset_list:
+                    return_assets_in_assetgroup.append(asset)
+        return return_assets_in_assetgroup
+    else:
+        return [f"There are no Assets in this Asset Group"]
+
+
 def create_app():
     app = Flask(__name__)
 

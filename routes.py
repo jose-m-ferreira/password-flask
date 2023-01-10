@@ -31,7 +31,7 @@ from flask_login import (
     login_required,
 )
 
-from app import create_app, db, login_manager, bcrypt, rsa, asset_group_list
+from app import create_app, db, login_manager, bcrypt, rsa, asset_group_list, asset_permited_group_list, asset_permited_user_list, return_assets_in_assetgroup
 from models import User, Groups, Asset, AssetGroups
 from forms import login_form, register_form, self_update_form, search_form
 from rsa_key_management import loadSecrets
@@ -191,41 +191,53 @@ def mypasswords_assetgroups(id):
     if current_user.is_authenticated:
         user = current_user.username
         userid = current_user.id
-        userGroupId = list(map(int,current_user.usergroupid.split(',')))
-        #group = Groups.query.filter_by(id=id).first()
-        all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid).all()
-        #print(userid, userGroupId)
-        #print(all_assets)
+        userGroupId = list(map(int, current_user.usergroupid.split(',')))
+
+        all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser,
+                                               Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid, Asset.assetgroups).all()
+        # print(userid, userGroupId)
+        # print(all_assets)
         user_assets = []
         for i in range(0, len(all_assets)):
-            #print(f"{all_assets[i][5]} - {all_assets[i]}")
-            #print(f"all_assets: {all_assets[i][5]}")
+            # print(f"{all_assets[i][5]} - {all_assets[i]}")
+            # print(f"all_assets: {all_assets[i][5]}")
             if all_assets[i][5]:
                 asset_permited_users = list(map(int, all_assets[i][5].split(',')))
-                #print(f"asset_permited_users: {asset_permited_users}")
+                # print(f"asset_permited_users: {asset_permited_users}")
                 if userid in (list(map(int, all_assets[i][5].split(',')))):
-                    #print(all_assets[i])
+                    # print(all_assets[i])
                     user_assets.append(all_assets[i])
         user_group_assets = []
         for i in range(0, len(all_assets)):
-            #print(f"{all_assets[i][6]} - {all_assets[i]}")
-            #print(f"list of permited user group ids: {list(map(int, all_assets[i][6].split(',')))}")
-            #print(f"list of user group ids: {userGroupId}")
-            #if any(userGroupId) in any((list(map(int, all_assets[i][6].split(','))))):
-            for ugid in userGroupId:
-                if ugid in list(map(int, all_assets[i][6].split(','))):
-                    #print(all_assets[i])
-                    user_group_assets.append(all_assets[i])
+            # print(f"{all_assets[i][6]} - {all_assets[i]}")
 
-        #remove duplicates from each list
+            # print(f"list of user groupids user belongs to: {userGroupId}")
+            # print(f"Asset permited user group ids: {len(all_assets[i][6].split(','))}")
+            # if any(userGroupId) in any((list(map(int, all_assets[i][6].split(','))))):
+            if len(all_assets[i][6].split(',')) > 1:
+                for ugid in userGroupId:
+                    if ugid in list(map(int, all_assets[i][6].split(','))):
+                        # print(all_assets[i])
+                        user_group_assets.append(all_assets[i])
+
+        # remove duplicates from each list
         user_assets = list(dict.fromkeys(user_assets))
         user_group_assets = list(dict.fromkeys(user_group_assets))
-        #print(user_assets)
-        #print(user_group_assets)
+        # print(f"search results: {user_assets, type(user_assets)}")
+        # print(user_group_assets)
+        user_and_group_assets = []
+        for usr in user_assets:
+            user_and_group_assets.append(usr)
+        for grp in user_group_assets:
+            user_and_group_assets.append(usr)
 
-        #return f"UserID: {userid} <br> UserGroupId: {userGroupId} <br> User Assets: {user_assets} <br> Group Assets: {user_group_assets}"
+        user_and_group_assets = list(dict.fromkeys(user_and_group_assets))
+        user_and_group_assets = return_assets_in_assetgroup(id, user_and_group_assets)
+
+        # return f"UserID: {userid} <br> UserGroupId: {userGroupId} <br> User Assets: {user_assets} <br> Group Assets: {user_group_assets}"
         assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-        return render_template('mypasswords.html', user_assets=user_assets, user_group_assets=user_group_assets, assetgroups=assetgroups)
+        return render_template('asset_group_passwords.html', user_and_group_assets=user_and_group_assets,
+                               assetgroups=assetgroups)
     else:
         return f"Error"
 
@@ -431,7 +443,7 @@ def create_asset():
         assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
         permiteduserid = request.form['permiteduserid']
         if not permiteduserid:
-            permiteduserid = current_user.id
+            permiteduserid = str(current_user.id)
         permitedgroupid = request.form['permitedgroupid']
         assetgroups = request.form['assetgroups']
 
@@ -469,13 +481,23 @@ def RetrieveSingleAsset(id):
             asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
             print(f"assetgroups: {asset.assetgroups, type(asset.assetgroups)}")
             if not asset.assetgroups:
-                asset_group_names = ['No Asset Groups Defined for this Asset']
+                asset_group_names = ['No Asset Groups configured for this Asset']
             else:
                 asset_group_names = asset_group_list(asset.assetgroups)
 
+            if not asset.permitedgroupid:
+                asset_permited_groups = ['No User Groups configured for this Asset']
+            else:
+                asset_permited_groups = asset_permited_group_list(asset.permitedgroupid)
+            print(f"asset.permiteduserid: {asset.permiteduserid, type(asset.permiteduserid)}")
+            if not asset.permiteduserid:
+                asset_permited_users = ['No Users configured for this Asset']
+            else:
+                asset_permited_users = asset_permited_user_list(asset.permiteduserid)
+
             assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-            return render_template('asset.html', asset=asset, assetgroups=assetgroups, asset_group_names=asset_group_names)
-        return f"Asset with id ={id} Doenst exist"
+            return render_template('asset.html', asset=asset, assetgroups=assetgroups, asset_group_names=asset_group_names, asset_permited_groups=asset_permited_groups, asset_permited_users=asset_permited_users)
+        return f"Asset with id ={id} Doesnt exist"
     else:
         return f"No permissions to view asset with id = {id}"
 
@@ -504,9 +526,15 @@ def updateasset(id):
                 assetuser = request.form['assetuser']
                 assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
                 permiteduserid = request.form['permiteduserid']
-                permitedgroupid = request.form['permitedgroupid']
-                assetgroups = request.form['assetgroups']
+                if not permiteduserid:
+                    permiteduserid = str(current_user.id)
 
+                permitedgroupid = request.form['permitedgroupid']
+                if not permitedgroupid:
+                    permitedgroupid ='0'
+                assetgroups = request.form['assetgroups']
+                if not assetgroups:
+                    assetgroups = ''
                 asset = Asset(id=id, assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
                       permitedgroupid=permitedgroupid, assetgroups=assetgroups)
@@ -578,7 +606,9 @@ def search():
         user_group_assets = []
         for i in range(0, len(all_assets)):
             for ugid in userGroupId:
-                if ugid in list(map(int, all_assets[i][6].split(','))):
+                print(all_assets[i][6].split(','))
+                #if ugid in list(map(int, all_assets[i][6].split(','))):
+                if ugid in all_assets[i][6].split(','):
                     # print(all_assets[i])
                     user_group_assets.append(all_assets[i])
 
