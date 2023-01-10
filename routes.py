@@ -31,7 +31,7 @@ from flask_login import (
     login_required,
 )
 
-from app import create_app,db,login_manager,bcrypt,rsa
+from app import create_app, db, login_manager, bcrypt, rsa, asset_group_list
 from models import User, Groups, Asset, AssetGroups
 from forms import login_form, register_form, self_update_form, search_form
 from rsa_key_management import loadSecrets
@@ -163,8 +163,8 @@ def mypasswords():
         for i in range(0, len(all_assets)):
             #print(f"{all_assets[i][6]} - {all_assets[i]}")
 
-            print(f"list of user groupids user belongs to: {userGroupId}")
-            print(f"Asset permited user group ids: {len(all_assets[i][6].split(','))}")
+            #print(f"list of user groupids user belongs to: {userGroupId}")
+            #print(f"Asset permited user group ids: {len(all_assets[i][6].split(','))}")
             #if any(userGroupId) in any((list(map(int, all_assets[i][6].split(','))))):
             if len(all_assets[i][6].split(',')) > 1:
                 for ugid in userGroupId:
@@ -458,7 +458,7 @@ def RetrieveSingleAsset(id):
     asset_permited_users = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
     asset_permited_groups_result = Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid).all()
 
-    if len (asset_permited_groups_result) > 1:
+    if len(asset_permited_groups_result) > 1:
         asset_permited_groups = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
 
     if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
@@ -467,8 +467,14 @@ def RetrieveSingleAsset(id):
         asset = Asset.query.filter_by(id=id).first()
         if asset:
             asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
+            print(f"assetgroups: {asset.assetgroups, type(asset.assetgroups)}")
+            if not asset.assetgroups:
+                asset_group_names = ['No Asset Groups Defined for this Asset']
+            else:
+                asset_group_names = asset_group_list(asset.assetgroups)
+
             assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-            return render_template('asset.html', asset=asset, assetgroups=assetgroups)
+            return render_template('asset.html', asset=asset, assetgroups=assetgroups, asset_group_names=asset_group_names)
         return f"Asset with id ={id} Doenst exist"
     else:
         return f"No permissions to view asset with id = {id}"

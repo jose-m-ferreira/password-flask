@@ -24,7 +24,22 @@ migrate = Migrate()
 bcrypt = Bcrypt()
 rsa = rsa
 
+def asset_group_list(asset_group_ids):
+    if asset_group_ids:
+        from models import AssetGroups
+        AssetGroups()
 
+        asset_group_ids = list(map(int, asset_group_ids.split(',')))
+        #print(f"asset_group_ids__: {asset_group_ids, type(asset_group_ids), asset_group_ids[0], type(asset_group_ids[0])}")
+        asset_group_list = []
+        for assetgroup in asset_group_ids:
+            #print(f"asset_group iteration: {AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all()[0][0], type(AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all()[0][0])}")
+            asset_group_list.append(AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all()[0][0])
+
+        #print(asset_group_list)
+        return asset_group_list
+    else:
+        return asset_groups_ids
 def create_app():
     app = Flask(__name__)
 

@@ -67,15 +67,25 @@
           <!-- Modal content -->
           <div class="modal-content">
             <span class="myAssetGroupsClose">&times;</span>
-            <p>{{asset.assetgroups}}</p>
+              <div class="container py-4 text-center" >
+                <TABLE align="center" border 1 id="assets">
+                    <thead>
+                    <tr>
+                        <th class="Asset Group"><center>Asset Group Name</center></th>
+                    </tr>
+                    </thead>
+                    {% for assetgroup in asset_group_names %}
+                    <TR>
+	                    <TD class="Asset Group">{{assetgroup}}</td>
+                    </TR>
+                    {% endfor %}
+                </TABLE>
           </div>
         </div>
 </td>
 <td class="Update"><a  href="/assets/{{asset.id}}/assetupdate">Edit Asset</a></td>
 </tr>
-
 </table>
     </div>
-
 {% endblock %}
 
