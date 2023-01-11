@@ -37,8 +37,8 @@ class Asset(db.Model):
     assetuser = db.Column(db.String(80), unique=False, nullable=False)
     assetpwd = db.Column(db.String(300), nullable=False, unique=False)
     permiteduserid = db.Column(db.String(300), nullable=True, unique=False)
-    permitedgroupid = db.Column(db.String(300), nullable=False, unique=False, default='0')
-    assetgroups = db.Column(db.String(120), unique=False, nullable=True, default='0')
+    permitedgroupid = db.Column(db.String(300), nullable=False, unique=False, default='')
+    assetgroups = db.Column(db.String(120), unique=False, nullable=True, default='')
 
 
 class AssetGroups(db.Model):
