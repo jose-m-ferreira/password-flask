@@ -303,6 +303,8 @@ def update(id):
                 return redirect(f'/groups/{id}')
             else:
                 return f"Group with id = {id} Does not exist"
+
+
         assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
         return render_template('groupupdate.html', group=group, assetgroups=assetgroups)
     else:
@@ -314,8 +316,26 @@ def update(id):
 @login_required
 def retrieve_user_list():
     users = User.query.with_entities(User.id, User.username, User.email, User.usergroupid)
+    user_result = []
+    for usr in users:
+        user_group_names = []
+        #usr_group_names = Groups.query.filter_by(id=usr.usergroupid).with_entities(Groups.groupname).first()
+
+        for usr_group in usr.usergroupid.split(','):
+            user_group_names.append(Groups.query.filter_by(id=usr_group).with_entities(Groups.groupname).first())
+
+
+        #print(f"usr {usr, type(usr)}")
+        #print(f"user_group_names {user_group_names, type(user_group_names)}")
+
+        user_result_temp = [usr, user_group_names]
+        #print(user_result_temp)
+        user_result.append(user_result_temp)
+
+    user_and_group_names = user_result
+    print(user_and_group_names)
     assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-    return render_template('user_list.html', users=users, assetgroups=assetgroups)
+    return render_template('user_list.html',users=users, user_and_group_names=user_and_group_names, assetgroups=assetgroups)
 
 
 #list individual users

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "mypassword_base.html" %}
 {% block title%} {{ title }} {% endblock %}
 {% block content%}
 
@@ -9,19 +9,47 @@
         <th class="User ID">User ID</th>
         <th class="User Name">Username</th>
         <th class="email">eMail</th>
-        <th class="usergroupid">User Groups List</th>
+        <th class="usergroupid">User Groups</th>
         <th class="Update">Update</th>
     </tr>
     </thead>
-{% for user in users %}
+{% for user in user_and_group_names %}
     <tr>
-        <td class="User ID">{{user.id}}</td>
-        <td class="User Name">{{user.username}}</td>
-        <td class="email">{{user.email}}</td>
-        <td class="usergroupid">{{user.usergroupid}}</td>
-        <td class="Update"><a  href="/users/{{user.id}}/userupdate">Edit User</a></td>
+        <td class="User ID">{{user[0].id}}</td>
+        <td class="User Name">{{user[0].username}}</td>
+        <td class="email">{{user[0].email}}</td>
+        <td class="usergroupid"><!-- Trigger/Open The Modal -->
+        <button id="myBtn">User Groups</button>
+
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+
+          <!-- Modal content -->
+          <div class="modal-content">
+            <span class="close">&times;</span>
+              <div class="container py-4 text-center" >
+                  <TABLE align="center" border 1 id="assets">
+                    <thead>
+                    <tr>
+                        <th class="Asset User"><center>User Groups</center></th>
+                    </tr>
+                    </thead>
+                    {% for user_group in user[1] %}
+                    <TR>
+
+	                    <TD class="Asset User">{{user_group[0]}}</td>
+
+                    </TR>
+                    {% endfor %}
+                </TABLE>
+              </div>
+                </div>
+        </div>
+</td></td>
+        <td class="Update"><a  href="/users/{{user[0].id}}/userupdate">Edit User</a></td>
     </tr>
 {% endfor %}
 </table>
         </div>
+
 {% endblock %}
