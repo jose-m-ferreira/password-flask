@@ -4,15 +4,47 @@
 
 <div class="container py-4 text-center">
 <form action='' method = "POST">
-  <p>Asset Name <input type = "text" name = "assetname" value="{{asset.assetname}}"/></p>
-  <p>Asset Description <input type = "text" name = "assetdescription" value="{{asset.assetdescription}}"/></p>
-   <p>Asset IPAddress<input type = "text" name = "assetipaddress" value="{{asset.assetipaddress}}"/></p>
-   <p>Asset Username <input type = "text" name = "assetuser" value="{{asset.assetuser}}"/></p>
-   <p>Asset Password <input type = "text" name = "assetpwd" value="{{asset.assetpwd}}"/></p>
-   <p>Asset Permited User Id List <input type = "text" name = "permiteduserid" value="{{asset.permiteduserid}}"/></p>
-   <p>Asset Permited Group Id List <input type = "text" name = "permitedgroupid" value="{{asset.permitedgroupid}}"/></p>
-    <p>Asset Groups Id List<input type = "text" name = "assetgroups" value="{{asset.assetgroups}}"/></p>
-  <p><input type = "submit" value = "Submit" /></p>
+<table align="center" border 1 id="assets" >
+  <thead>
+    <tr>
+        <th class="item"></th>
+        <th class="value"></th>
+    </tr>
+  </thead>
+    <tr>
+        <td class="item">Asset Name</td>
+        <td class="value"><input type = "text" name = "assetname" value="{{asset.assetname}}"/></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Description</td>
+        <td class="value"><input type = "text" name = "assetdescription" value="{{asset.assetdescription}}"/></td>
+    </tr>
+     <tr>
+        <td class="item">Asset IPAddress</td>
+        <td class="value"><input type = "text" name = "assetipaddress" value="{{asset.assetipaddress}}"/></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Username</td>
+        <td class="value"><input type = "text" name = "assetuser" value="{{asset.assetuser}}"/></td>
+    </tr>
+     <tr>
+        <td class="item">Asset Password</td>
+        <td class="value"><input type = "text" name = "assetpwd" value="{{asset.assetpwd}}"/></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Permited User Id List</td>
+        <td class="value"><input type = "text" name = "permiteduserid" value="{{asset.permiteduserid}}"/></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Permited Group Id List</td>
+        <td class="value"><input type = "text" name = "permitedgroupid" value="{{asset.permitedgroupid}}"/></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Groups Id List</td>
+        <td class="value"><input type = "text" name = "assetgroups" value="{{asset.assetgroups}}"/></td>
+    </tr>
+</table>
+<p><input type="button" value="Cancel" onclick="history.back()"><input type = "submit" value = "Submit" /></p>
 </form>
-    </div>
+</div>
 {% endblock %}

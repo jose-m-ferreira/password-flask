@@ -468,10 +468,16 @@ def RetrieveSingleAsset(id):
     userGroupId = list(map(int, current_user.usergroupid.split(',')))
 
     asset_permited_users = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
-    asset_permited_groups_result = Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid).all()
+    asset_permited_groups_result =list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
 
-    if len(asset_permited_groups_result) > 1:
+    print(f"routes: len asset_permited_groups_result: {len(asset_permited_groups_result), asset_permited_groups_result}")
+
+    if len(asset_permited_groups_result) > 0:
+        print(f"routes: asset_permited_groups query before map: {Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')}")
         asset_permited_groups = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
+    else:
+        print(f"(asset_permited_groups_result): {(asset_permited_groups_result)}")
+        print(f"len(asset_permited_groups_result) {len(asset_permited_groups_result)}")
 
     if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
         #print(f"either userid {userid} or group {userGroupId} matched {asset_permited_users} or {asset_permited_groups}")
@@ -493,6 +499,7 @@ def RetrieveSingleAsset(id):
             if not asset.permiteduserid:
                 asset_permited_users = ['No Users configured for this Asset']
             else:
+                print(f"asset.permiteduserid {asset.permiteduserid}")
                 asset_permited_users = asset_permited_user_list(asset.permiteduserid)
 
             assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
@@ -510,7 +517,9 @@ def updateasset(id):
     userGroupId = list(map(int, current_user.usergroupid.split(',')))
 
     asset_permited_users = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
+    print(f"routes: asset_permited_groups before map: {Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')}")
     asset_permited_groups = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
+    print(f"routes: asset_permited_groups {asset_permited_groups}")
 
     if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
         asset = Asset.query.filter_by(id=id).first()

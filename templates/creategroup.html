@@ -2,10 +2,22 @@
 {% block title%} {{ title }} {% endblock %}
 {% block content%}
 
+
 <div class="container py-4 text-center">
 <form action='' method = "POST">
-  <p>Group Name <input type = "text" name = "groupname" /></p>
-  <p><input type = "submit" value = "Submit" /></p>
+<table align="center" border 1 id="assets" >
+  <thead>
+    <tr>
+        <th class="item"></th>
+        <th class="value"></th>
+    </tr>
+  </thead>
+    <tr>
+        <td class="item">Group Name</td>
+        <td class="value"><input type = "text" name = "groupname" /></td>
+    </tr>
+    </table>
+<p><input type="button" value="Cancel" onclick="history.back()"><input type = "submit" value = "Submit" /></p>
 </form>
-      </div>
+</div>
 {% endblock %}
