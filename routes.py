@@ -166,7 +166,7 @@ def mypasswords():
             #print(f"list of user groupids user belongs to: {userGroupId}")
             #print(f"Asset permited user group ids: {len(all_assets[i][6].split(','))}")
             #if any(userGroupId) in any((list(map(int, all_assets[i][6].split(','))))):
-            if len(all_assets[i][6].split(',')) > 1:
+            if len(all_assets[i][6].split(',')) > 0:
                 for ugid in userGroupId:
                     if ugid in list(map(int, all_assets[i][6].split(','))):
                         #print(all_assets[i])
@@ -440,7 +440,7 @@ def selfupdateuser():
 @login_required
 def RetrieveAssetList():
     if current_user.is_authenticated and 1 in list(map(int, current_user.usergroupid.split(','))):
-        assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetdescription, Asset.assetipaddress,  Asset.permiteduserid, Asset.permitedgroupid, Asset.assetgroups)
+        assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetdescription, Asset.assetipaddress,  Asset.permiteduserid, Asset.permitedgroupid, Asset.assetgroups, Asset.assetnotes)
         assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
         return render_template('assets_list.html', assets=assets, assetgroups=assetgroups)
     return f"not an admin"
@@ -458,6 +458,7 @@ def create_asset():
         #id = request.form['id']
         assetname = request.form['assetname']
         assetdescription = request.form['assetdescription']
+        assetnotes = request.form['assetnotes']
         assetipaddress = request.form['assetipaddress']
         assetuser = request.form['assetuser']
         assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
@@ -469,7 +470,7 @@ def create_asset():
 
         asset = Asset(assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
-                      permitedgroupid=permitedgroupid)
+                      permitedgroupid=permitedgroupid, assetnotes=assetnotes)
         try:
             db.session.add(asset)
             db.session.commit()
@@ -557,6 +558,7 @@ def updateasset(id):
 
                 assetname = request.form['assetname']
                 assetdescription = request.form['assetdescription']
+                assetnotes = request.form['assetnotes']
                 assetipaddress = request.form['assetipaddress']
                 assetuser = request.form['assetuser']
                 assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
@@ -572,7 +574,7 @@ def updateasset(id):
                     assetgroups = ''
                 asset = Asset(id=id, assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
-                      permitedgroupid=permitedgroupid, assetgroups=assetgroups)
+                      permitedgroupid=permitedgroupid, assetgroups=assetgroups, assetnotes=assetnotes)
 
                 db.session.add(asset)
                 db.session.commit()

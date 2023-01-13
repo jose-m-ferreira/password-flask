@@ -2,7 +2,7 @@
 {% block title%} {{ title }} {% endblock %}
 {% block content%}
 
-<div class="container py-4 text-center" style="overflow-x:auto;">
+<div class="container py-1 text-center" style="overflow-x:auto;">
 <table align="center" border 1 id="assets" >
     <thead>
     <tr>
@@ -11,6 +11,7 @@
         <th class="Asset Description">Asset Description</th>
         <th class="Asset IPAddress">Asset IPAddress</th>
         <th class="Asset User">Asset User</th>
+        <th class="Asset Notes">Asset Notes</th>
         <th class="Asset Password">Asset Password</th>
         <th class="Asset Permited User Ids">Asset Permited User Ids</th>
         <th class="Asset Permited Group Ids">Asset Permited Group Ids</th>
@@ -24,6 +25,7 @@
         <td class="Asset Description">{{asset.assetdescription}}</td>
         <td class="Asset IPAddress">{{asset.assetipaddress}}</td>
         <td class="Asset User">{{asset.assetuser}}</td>
+        <td class="Asset Notes">{{asset.assetnotes}}</td>
         <td class="Asset Password"><a  href="/assets/{{asset.id}}">Show Pass</a></td>
         <td class="Asset Permited User Ids">{{asset.permiteduserid}}</td>
         <td class="Asset Permited Group Ids">{{asset.permitedgroupid}}</td>
