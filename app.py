@@ -4,15 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from flask_login import (
-    UserMixin,
-    login_user,
     LoginManager,
-    current_user,
-    logout_user,
-    login_required,
 )
-
-#import models
 
 login_manager = LoginManager()
 login_manager.session_protection = "strong"
@@ -106,10 +99,13 @@ def return_group_name(id):
 def create_app():
     app = Flask(__name__)
 
-    app.secret_key = 'secret-key'
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-
+    #app.secret_key = 'secret-key'
+    #app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
+    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+    import loadAlchemy
+    app.secret_key = loadAlchemy.app_secret_key
+    app.config['SQLALCHEMY_DATABASE_URI'] = loadAlchemy.app_config_SQLALCHEMY_DATABASE_URI
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = loadAlchemy.app_config_SQLALCHEMY_DATABASE_URI
     login_manager.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
@@ -118,4 +114,4 @@ def create_app():
     return app
 
 def __init__():
-    import models
+    pass
