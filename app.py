@@ -91,6 +91,18 @@ def return_assets_in_assetgroup(assetgroupid, assetgrouplist):
         return [f"There are no Assets in this Asset Group"]
 
 
+def return_groupnames():
+    from models import Groups
+    Groups()
+    return Groups.query.with_entities(Groups.id, Groups.groupname).all()
+
+
+def return_group_name(id):
+    from models import Groups
+    Groups()
+    return id, Groups.query.filter_by(id=id).with_entities(Groups.groupname).first()[0]
+
+
 def create_app():
     app = Flask(__name__)
 

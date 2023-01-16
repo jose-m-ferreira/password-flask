@@ -1,14 +1,90 @@
-{% extends "base.html" %}
+{% extends "update_base.html" %}
 {% block title%} {{ title }}
-{% endblock %}
-{% block content%}
 
+{% endblock %}
+
+{% block content%}
 <div class="container py-1 text-center">
-<form action='' method = "POST">
-  <p>User Name <input type = "text" name = "username" value="{{user.username}}"/></p>
-  <p>eMail<input type = "text" name = "email" value="{{user.email}}"/></p>
-  <p>Group(s) Id(s)<input type = "text" name = "usergroupid" value="{{user.usergroupid}}"/></p>
-  <p><input type = "submit" value = "Submit" /></p>
-</form>
-    </div>
+ <br /><br />
+  <div class="container py-1 text-center">
+    <form method="post" id="multiple_select_form">
+        <table align="center" border 1 id="assets" >
+            <thead>
+                <tr>
+                <th class="item"></th>
+                <th class="value"></th>
+                </tr>
+            </thead>
+            <tr>
+                <td class="item">User Name</td>
+                <td class="value"><input type = "text" name = "username" value="{{user.username}}"/></td>
+            </tr>
+            <tr>
+                <td class="item">eMail</td>
+                <td class="value"><input type = "text" name = "email" value="{{user.email}}"/></td>
+            </tr>
+            <tr>
+                <td class="item">User Groups</td>
+                <td class="value">
+                    <select required name="skills" id="skills" class="form-control selectpicker" data-live-search="true" multiple>
+                        {% for group in all_user_groups%}
+                            <option  value="{{group[0]}}">{{group[1]}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+             </tr>
+        </table>
+        <br>
+        <input type="hidden" name="hidden_skills" id="hidden_skills" value=skills />
+        <input type="submit" name="submit" class="btn btn-info" value="Submit" />
+    </form>
+  <br />
+  </div>
+
+
+ <script>
+    $(document).ready(function(){
+     $('.selectpicker').selectpicker();
+
+     $('.selectpicker').val([{{this_user_groups}}]).selectpicker('refresh');
+
+     $('#skills').change(function(){
+      $('#hidden_skills').val($('#skills').val());
+     });
+
+
+     $('#multiple_select_form').on('submit', function(event){
+      event.preventDefault();
+      if($('#skills').val() != '')
+      {
+       $('#hidden_skills').val($('#skills').val());
+       var form_data = $(this).serialize();
+       $.ajax({
+        url:"/users/{{user.id}}/userupdate",
+        method:"POST",
+        data:form_data,
+        success:function(data)
+        {
+         window.location.href = '/users/{{user.id}}';
+         //console.log(data);
+         $('#hidden_skills').val('');
+         $('.selectpicker').selectpicker('val', '');
+
+        }
+       })
+      }
+      else
+      {
+            $.ajax({
+            url: '/users/{{user.id}}/userupdate',
+            type: 'post',
+            data: $('#myForm').serialize(),
+            success: function(response) {
+                window.location.href = '/users/{{user.id}}';
+            }
+        });
+      }
+     });
+    });
+    </script>
 {% endblock %}

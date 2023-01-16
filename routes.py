@@ -18,6 +18,7 @@ from sqlalchemy.exc import (
     InvalidRequestError,
 )
 from werkzeug.routing import BuildError
+from werkzeug.datastructures import ImmutableMultiDict
 
 
 from flask_bcrypt import Bcrypt,generate_password_hash, check_password_hash
@@ -31,7 +32,7 @@ from flask_login import (
     login_required,
 )
 
-from app import create_app, db, login_manager, bcrypt, rsa, asset_group_list, asset_permited_group_list, asset_permited_user_list, return_assets_in_assetgroup
+from app import create_app, db, login_manager, bcrypt, rsa, asset_group_list, asset_permited_group_list, asset_permited_user_list, return_assets_in_assetgroup, return_group_name, return_groupnames
 from models import User, Groups, Asset, AssetGroups
 from forms import login_form, register_form, self_update_form, search_form
 from rsa_key_management import loadSecrets
@@ -161,12 +162,15 @@ def mypasswords():
                     user_assets.append(all_assets[i])
         user_group_assets = []
         for i in range(0, len(all_assets)):
-            #print(f"{all_assets[i][6]} - {all_assets[i]}")
+            print(f"{all_assets[i][6]} - {all_assets[i]}")
 
-            #print(f"list of user groupids user belongs to: {userGroupId}")
-            #print(f"Asset permited user group ids: {len(all_assets[i][6].split(','))}")
+            print(f"list of user groupids user belongs to: {userGroupId}")
+            print(f"Asset permited user group ids: {(all_assets[i][6].split(',')[0]), type(all_assets[i][6].split(',')[0]), len(all_assets[i][6].split(',')[0])}")
+
             #if any(userGroupId) in any((list(map(int, all_assets[i][6].split(','))))):
-            if len(all_assets[i][6].split(',')) > 0:
+
+            if (len(all_assets[i][6].split(',')[0]) > 0):
+
                 for ugid in userGroupId:
                     if ugid in list(map(int, all_assets[i][6].split(','))):
                         #print(all_assets[i])
@@ -356,27 +360,50 @@ def retrieve_single_user(id):
 def updateuser(id):
     if current_user.is_authenticated and 1 in list(map(int, current_user.usergroupid.split(','))):
         user = User.query.filter_by(id=id).first()
+        all_user_groups = return_groupnames()
+
+        this_user_groups = user.usergroupid
+
+        #for ugid in user.usergroupid.split(','):
+
+         #   this_user_groups = this_user_groups + str(ugid)
+        #print(user, type(user), all_user_groups, type(all_user_groups), this_user_groups, type(this_user_groups))
         if request.method == 'POST':
-            if user:
-                #we don't want to change password so let's get it:
-                user_password = User.query.filter_by(id=id).with_entities(User.pwd).first()
-                user_password = user_password[0]
+            #print(f"request method: {request.form.keys()}")
+            #print(f"request form: {request.form}")
 
-                db.session.delete(user)
-                db.session.commit()
+            if "username" in request.form.keys():
+                if user:
+                    ##we don't want to change password so let's get it:
+                    user_password = User.query.filter_by(id=id).with_entities(User.pwd).first()
+                    user_password = user_password[0]
+    #
+                    db.session.delete(user)
+                    db.session.commit()
+    #
+                    username = request.form['username']
+                    email = request.form['email']
 
-                username = request.form['username']
-                email = request.form['email']
-                usergroupid = request.form['usergroupid']
-                user = User(id=id, username=username, email=email, usergroupid=usergroupid, pwd=user_password)
+                    #request.form is an immutablemultidict!!!
+                    #print(f"skills: {request.form.getlist('skills')}")
+                    #print(f"skills str: {','.join(request.form.getlist('skills'))}")
 
-                db.session.add(user)
-                db.session.commit()
-                return redirect(f'/users/{id}')
+                    usergroupid = ','.join(request.form.getlist('skills'))
+                    #print(f"usergroupid: {usergroupid, type(usergroupid)}")
+                    user = User(id=id, username=username, email=email, usergroupid=usergroupid, pwd=user_password)
+    #
+                    db.session.add(user)
+                    db.session.commit()
+                    return redirect(f'/users/{id}')
+                else:
+                    return f"User with id = {id} Does not exist"
             else:
+                #print(f"hidden_skills in a ajax submit {request.form['hidden_skills']}")
+
+                #print(f"request: {request.form}")
                 return f"User with id = {id} Does not exist"
         assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-        return render_template('userupdate.html', user=user, assetgroups=assetgroups)
+        return render_template('userupdate.html', user=user, assetgroups=assetgroups, all_user_groups=all_user_groups, this_user_groups=this_user_groups)
     else:
         return f"User with id ={id} Does not exist"
 
