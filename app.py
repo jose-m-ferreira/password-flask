@@ -23,13 +23,13 @@ def asset_group_list(asset_group_ids):
         AssetGroups()
         asset_group_list = []
         asset_group_ids = list(map(int, asset_group_ids.split(',')))
-        print(f"app.py asset_group_ids__: {asset_group_ids, type(asset_group_ids), asset_group_ids[0], type(asset_group_ids[0])}")
+        print(f"app.py asset_group_ids: {asset_group_ids, type(asset_group_ids), asset_group_ids[0], type(asset_group_ids[0])}")
         if asset_group_ids[0] == 0:
             return asset_group_list
 
         for assetgroup in asset_group_ids:
-            print(f"app.py: asset_group iteration: {AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all()[0][0], type(AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all()[0][0])}")
-            asset_group_list.append(AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all()[0][0])
+            print(f"app.py: asset_group iteration: {AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all(), type(AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all())}")
+            asset_group_list.append(AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all())
 
         #print(asset_group_list)
         return asset_group_list
@@ -60,11 +60,12 @@ def asset_permited_user_list(asset_permited_user_ids):
         print(f"app.py: asset_permited_user_ids {asset_permited_user_ids, type(asset_permited_user_ids)}")
 
         asset_permited_user_list = []
-        for permited_user in asset_permited_user_ids:
-            print(f"app.py: permited_user: {User.query.filter_by(id=permited_user).with_entities(User.username).all()}")
-            asset_permited_user_list.append(
-                User.query.filter_by(id=permited_user).with_entities(User.username).all()[0][0])
-        return asset_permited_user_list
+        if asset_permited_user_ids != [0]:
+            for permited_user in asset_permited_user_ids:
+                print(f"app.py: permited_user: {User.query.filter_by(id=permited_user).with_entities(User.username).all()}")
+                asset_permited_user_list.append(
+                    User.query.filter_by(id=permited_user).with_entities(User.username).all()[0][0])
+            return asset_permited_user_list
     else:
         return asset_permited_user_ids
 
@@ -105,7 +106,7 @@ def create_app():
     import loadAlchemy
     app.secret_key = loadAlchemy.app_secret_key
     app.config['SQLALCHEMY_DATABASE_URI'] = loadAlchemy.app_config_SQLALCHEMY_DATABASE_URI
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = loadAlchemy.app_config_SQLALCHEMY_DATABASE_URI
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = loadAlchemy.app_config_SQLALCHEMY_TRACK_MODIFICATIONS
     login_manager.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)

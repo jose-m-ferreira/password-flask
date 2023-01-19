@@ -31,15 +31,16 @@ class Asset(db.Model):
     __searchable__=['assetname', 'assetdescription', 'assetipaddress', 'assetgroups', 'assetnotes']
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    assetname = db.Column(db.String(80), unique=True, nullable=False)
+    assetname = db.Column(db.String(120), unique=True, nullable=False)
     assetdescription = db.Column(db.String(120), unique=False, nullable=True)
     assetipaddress = db.Column(db.String(80), unique=False, nullable=False)
     assetuser = db.Column(db.String(80), unique=False, nullable=False)
-    assetpwd = db.Column(db.String(300), nullable=False, unique=False)
+    assetpwd = db.Column(db.Text, nullable=False, unique=False)
     permiteduserid = db.Column(db.String(300), nullable=True, unique=False)
     permitedgroupid = db.Column(db.String(300), nullable=False, unique=False, default='')
     assetgroups = db.Column(db.String(120), unique=False, nullable=True, default='')
-    assetnotes = db.Column(db.String(120), unique=False, nullable=True)
+    assetnotes = db.Column(db.String(512), unique=False, nullable=True)
+
 
 class AssetGroups(db.Model):
     __tablename__ = "assetgroups"

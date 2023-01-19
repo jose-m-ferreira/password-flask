@@ -37,6 +37,7 @@ from models import User, Groups, Asset, AssetGroups
 from forms import login_form, register_form, self_update_form, search_form
 from rsa_key_management import loadSecrets
 from load_groups import insert_group_data
+import pandas as pd
 
 insert_group_data()
 privateKey, publicKey = loadSecrets()
@@ -195,34 +196,31 @@ def mypasswords_assetgroups(id):
     if current_user.is_authenticated:
         user = current_user.username
         userid = current_user.id
+        print(f"current_user.usergroupid {current_user.usergroupid}")
         userGroupId = list(map(int, current_user.usergroupid.split(',')))
 
-        all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser,
+        all_assets = Asset.query.filter_by(assetgroups=id).with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser,
                                                Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid, Asset.assetgroups).all()
-        # print(userid, userGroupId)
-        # print(all_assets)
+        print(f"routes.py /search: userid:  {userid}, userGroupId: {userGroupId}")
+        # for asset in all_assets:
+        # print(f"routes.py /search: all_assets: {asset}")
         user_assets = []
         for i in range(0, len(all_assets)):
-            # print(f"{all_assets[i][5]} - {all_assets[i]}")
-            # print(f"all_assets: {all_assets[i][5]}")
             if all_assets[i][5]:
                 asset_permited_users = list(map(int, all_assets[i][5].split(',')))
-                # print(f"asset_permited_users: {asset_permited_users}")
                 if userid in (list(map(int, all_assets[i][5].split(',')))):
-                    # print(all_assets[i])
                     user_assets.append(all_assets[i])
+        # print(f"routes.py - user_assets 678 {user_assets}")
         user_group_assets = []
         for i in range(0, len(all_assets)):
-            # print(f"{all_assets[i][6]} - {all_assets[i]}")
-
-            # print(f"list of user groupids user belongs to: {userGroupId}")
-            # print(f"Asset permited user group ids: {len(all_assets[i][6].split(','))}")
-            # if any(userGroupId) in any((list(map(int, all_assets[i][6].split(','))))):
-            if len(all_assets[i][6].split(',')) > 1:
-                for ugid in userGroupId:
-                    if ugid in list(map(int, all_assets[i][6].split(','))):
-                        # print(all_assets[i])
-                        user_group_assets.append(all_assets[i])
+            print(f"routes.py - /search i: {i}")
+            for ugid in userGroupId:
+                print(f"{ugid} - all_assets[i][6].split(',') {all_assets[i][6].split(',')}")
+                # if ugid in list(map(int, all_assets[i][6].split(','))):
+                if ugid in list(map(int, all_assets[i][6].split(','))):
+                    print(f"all_assets[i] {all_assets[i]}")
+                    user_group_assets.append(all_assets[i])
+        print(f"routes.py - user_group_assets 687 {user_group_assets}")
 
         # remove duplicates from each list
         user_assets = list(dict.fromkeys(user_assets))
@@ -233,7 +231,7 @@ def mypasswords_assetgroups(id):
         for usr in user_assets:
             user_and_group_assets.append(usr)
         for grp in user_group_assets:
-            user_and_group_assets.append(usr)
+            user_and_group_assets.append(grp)
 
         user_and_group_assets = list(dict.fromkeys(user_and_group_assets))
         user_and_group_assets = return_assets_in_assetgroup(id, user_and_group_assets)
@@ -488,7 +486,8 @@ def create_asset():
         assetnotes = request.form['assetnotes']
         assetipaddress = request.form['assetipaddress']
         assetuser = request.form['assetuser']
-        assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
+        assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey).hex()
+        print(f"assetpwd: {assetpwd, type(assetpwd)}")
         permiteduserid = request.form['permiteduserid']
         if not permiteduserid:
             permiteduserid = str(current_user.id)
@@ -514,9 +513,11 @@ def create_asset():
 def RetrieveSingleAsset(id):
     userid = current_user.id
     userGroupId = list(map(int, current_user.usergroupid.split(',')))
-
-    asset_permited_users = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
-
+    if Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0]:
+        print(f"518: {Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0]}")
+        asset_permited_users = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
+    else:
+        asset_permited_users = []
     print(f" asset_permited_groups_result query: {Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0]}")
     if Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0]:
         asset_permited_groups_result =list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
@@ -536,7 +537,8 @@ def RetrieveSingleAsset(id):
 
         asset = Asset.query.filter_by(id=id).first()
         if asset:
-            asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
+            print(f"asset.assetpwd {asset.assetpwd, type(asset.assetpwd)}")
+            asset.assetpwd = rsa.decrypt(bytes.fromhex(asset.assetpwd), privateKey).decode()
             print(f"assetgroups: {asset.assetgroups, type(asset.assetgroups)}")
             if not asset.assetgroups:
                 asset_group_names = ['No Asset Groups configured for this Asset']
@@ -567,9 +569,12 @@ def RetrieveSingleAsset(id):
 def updateasset(id):
     userid = current_user.id
     userGroupId = list(map(int, current_user.usergroupid.split(',')))
-
-    asset_permited_users = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
-    print(f"routes: asset_permited_groups before map: {Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0]}")
+    print(f"575 {Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0]}")
+    if Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0]:
+        asset_permited_users = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
+        print(f"routes: asset_permited_groups before map: {Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0]}")
+    else:
+        asset_permited_users = []
     if Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0]:
         asset_permited_groups = list(map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
     else:
@@ -577,7 +582,7 @@ def updateasset(id):
 
     if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
         asset = Asset.query.filter_by(id=id).first()
-        asset.assetpwd = rsa.decrypt(asset.assetpwd, privateKey).decode()
+        asset.assetpwd = rsa.decrypt(bytes.fromhex(asset.assetpwd), privateKey).decode()
         if request.method == 'POST':
             if asset:
                 db.session.delete(asset)
@@ -588,7 +593,8 @@ def updateasset(id):
                 assetnotes = request.form['assetnotes']
                 assetipaddress = request.form['assetipaddress']
                 assetuser = request.form['assetuser']
-                assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey)
+                assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey).hex()
+
                 permiteduserid = request.form['permiteduserid']
                 if not permiteduserid:
                     permiteduserid = str(current_user.id)
@@ -657,25 +663,30 @@ def search():
     if current_user.is_authenticated:
         user = current_user.username
         userid = current_user.id
+        print(f"current_user.usergroupid {current_user.usergroupid}")
         userGroupId = list(map(int, current_user.usergroupid.split(',')))
-        all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid).all()
+        all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid, Asset.assetnotes, Asset.assetdescription).all()
 
+        print(f"routes.py /search: userid:  {userid}, userGroupId: {userGroupId}")
+        #for asset in all_assets:
+            #print(f"routes.py /search: all_assets: {asset}")
         user_assets = []
         for i in range(0, len(all_assets)):
             if all_assets[i][5]:
                 asset_permited_users = list(map(int, all_assets[i][5].split(',')))
                 if userid in (list(map(int, all_assets[i][5].split(',')))):
                     user_assets.append(all_assets[i])
-
+        #print(f"routes.py - user_assets 678 {user_assets}")
         user_group_assets = []
         for i in range(0, len(all_assets)):
+            print(f"routes.py - /search i: {i}")
             for ugid in userGroupId:
-                print(all_assets[i][6].split(','))
+                print(f"{ugid} - all_assets[i][6].split(',') {all_assets[i][6].split(',')}")
                 #if ugid in list(map(int, all_assets[i][6].split(','))):
-                if ugid in all_assets[i][6].split(','):
-                    # print(all_assets[i])
+                if ugid in list(map(int, all_assets[i][6].split(','))):
+                    print(f"all_assets[i] {all_assets[i]}")
                     user_group_assets.append(all_assets[i])
-
+        print(f"routes.py - user_group_assets 687 {user_group_assets}")
 
 
         user_assets = list(dict.fromkeys(user_assets))
@@ -689,6 +700,7 @@ def search():
                 search_item = form.search_item.data
                 if not all_assets:
                     flash(f"No Assets found for {search_item}", "search_empty_result")
+                    assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
                     return render_template("search.html", form=form, text="Search Assets", title="Search Assets",
                                            btn_action="Search Assets")
 
@@ -710,18 +722,18 @@ def search():
                         return show_search_results(search_results)
                     else:
                         flash(f"No Assets found for {search_item}", "search_empty_result")
+                        assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
                         return render_template("search.html", form=form, text="Search Assets", title="Search Assets",
-                                               btn_action="Search Assets")
+                                               btn_action="Search Assets", assetgroups=assetgroups)
 
             except:
+                assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
                 return render_template("search.html", form=form, text="Search Assets", title="Search Assets",
-                                       btn_action="Search Assets")
+                                       btn_action="Search Assets", assetgroups=assetgroups)
         #print('form did not validate on submit')
+    assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
     return render_template("search.html", form=form, text="Search Assets", title="Search Assets",
-                           btn_action="Search Assets")
-
-
-
+                           btn_action="Search Assets", assetgroups=assetgroups)
 
 
 
