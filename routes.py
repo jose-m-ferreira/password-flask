@@ -476,10 +476,13 @@ def RetrieveAssetList():
 @login_required
 def create_asset():
     if request.method == 'GET':
+        all_user_groups = return_groupnames()
+        this_asset_groups = Asset.assetgroups
         assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-        return render_template('createasset.html', assetgroups=assetgroups)
+        return render_template('createasset.html', assetgroups=assetgroups, all_user_groups=all_user_groups, this_asset_groups=this_asset_groups)
 
     if request.method == 'POST':
+        print(f"skills: {request.form.getlist('skills')}")
         #id = request.form['id']
         assetname = request.form['assetname']
         assetdescription = request.form['assetdescription']
@@ -491,7 +494,7 @@ def create_asset():
         permiteduserid = request.form['permiteduserid']
         if not permiteduserid:
             permiteduserid = str(current_user.id)
-        permitedgroupid = request.form['permitedgroupid']
+        permitedgroupid = ','.join(request.form.getlist('skills'))
         assetgroups = request.form['assetgroups']
 
         asset = Asset(assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
@@ -567,6 +570,9 @@ def RetrieveSingleAsset(id):
 @app.route('/assets/<int:id>/assetupdate', methods=['GET', 'POST'])
 @login_required
 def updateasset(id):
+    all_user_groups = return_groupnames()
+    this_asset_groups = Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0]
+    print(f"this_asset_groups:  {this_asset_groups}")
     userid = current_user.id
     userGroupId = list(map(int, current_user.usergroupid.split(',')))
     print(f"575 {Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0]}")
@@ -599,7 +605,7 @@ def updateasset(id):
                 if not permiteduserid:
                     permiteduserid = str(current_user.id)
 
-                permitedgroupid = request.form['permitedgroupid']
+                permitedgroupid = ','.join(request.form.getlist('skills'))
                 if not permitedgroupid:
                     permitedgroupid ='0'
                 assetgroups = request.form['assetgroups']
@@ -615,7 +621,7 @@ def updateasset(id):
             else:
                 return f"Asset with id = {id} Does not exist"
         assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-        return render_template('assetupdate.html', asset=asset, assetgroups=assetgroups)
+        return render_template('assetupdate.html', asset=asset, assetgroups=assetgroups, all_user_groups=all_user_groups, this_asset_groups=this_asset_groups)
     else:
         return f"No permissions to edit asset with id = {id}"
 

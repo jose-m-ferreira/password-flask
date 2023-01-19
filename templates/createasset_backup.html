@@ -1,0 +1,54 @@
+{% extends "mypassword_base.html" %}
+{% block title%} {{ title }} {% endblock %}
+{% block content%}
+
+<div class="container py-1 text-center">
+<form action='' method = "POST">
+<table align="center" border 1 id="assets" >
+  <thead>
+    <tr>
+        <th class="item"></th>
+        <th class="value"></th>
+    </tr>
+  </thead>
+    <tr>
+        <td class="item">Asset Name</td>
+        <td class="value"><input type = "text" name = "assetname" /></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Description</td>
+        <td class="value"><input type = "text" name = "assetdescription" /></td>
+    </tr>
+     <tr>
+        <td class="item">Asset IPAddress</td>
+        <td class="value"><input type = "text" name = "assetipaddress" /></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Username</td>
+        <td class="value"><input type = "text" name = "assetuser" /></td>
+    </tr>
+     <tr>
+        <td class="item">Asset Password</td>
+        <td class="value"><input type = "text" name = "assetpwd" /></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Permited User Id List</td>
+        <td class="value"><input type = "text" name = "permiteduserid" /></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Permited Group Id List</td>
+        <td class="value"><input type = "text" name = "permitedgroupid" /></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Groups Id List</td>
+        <td class="value"><input type = "text" name = "assetgroups" /></td>
+    </tr>
+    <tr>
+        <td class="item">Asset Notes</td>
+        <td class="value"><input type = "text" name = "assetnotes" /></td>
+    </tr>
+</table>
+<p><input type="button" value="Cancel" onclick="history.back()"><input type = "submit" value = "Submit" /></p>
+</form>
+</div>
+{% endblock %}

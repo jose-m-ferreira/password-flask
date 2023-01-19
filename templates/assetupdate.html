@@ -1,5 +1,6 @@
-{% extends "mypassword_base.html" %}
-{% block title%} {{ title }} {% endblock %}
+{% extends "update_base.html" %}
+{% block title%} {{ title }}
+{% endblock %}
 {% block content%}
 
 
@@ -14,48 +15,98 @@
   </thead>
     <tr>
         <td class="item">Asset Name</td>
-        <td class="value"><input type = "text" name = "assetname" value="{{asset.assetname}}"/></td>
+        <td class="value"><input type = "text" class="form-control" name = "assetname" value="{{asset.assetname}}"/></td>
     </tr>
     <tr>
         <td class="item">Asset Description</td>
-        <td class="value"><input type = "text" name = "assetdescription" value="{{asset.assetdescription}}"/></td>
+        <td class="value"><input type = "text" class="form-control" name = "assetdescription" value="{{asset.assetdescription}}"/></td>
     </tr>
      <tr>
         <td class="item">Asset IPAddress</td>
-        <td class="value"><input type = "text" name = "assetipaddress" value="{{asset.assetipaddress}}"/></td>
+        <td class="value"><input type = "text" class="form-control" name = "assetipaddress" value="{{asset.assetipaddress}}"/></td>
     </tr>
     <tr>
         <td class="item">Asset Username</td>
-        <td class="value"><input type = "text" name = "assetuser" value="{{asset.assetuser}}"/></td>
+        <td class="value"><input type = "text" class="form-control" name = "assetuser" value="{{asset.assetuser}}"/></td>
     </tr>
      <tr>
         <td class="item">Asset Password</td>
-        <td class="value"><input type = "text" name = "assetpwd" value="{{asset.assetpwd}}"/></td>
+        <td class="value"><input type = "text" class="form-control" name = "assetpwd" value="{{asset.assetpwd}}"/></td>
     </tr>
     <tr>
         <td class="item">Asset Permited User Id List</td>
-        <td class="value"><input type = "text" name = "permiteduserid" value="{{asset.permiteduserid}}"/></td>
+        <td class="value"><input type = "text" class="form-control" name = "permiteduserid" value="{{asset.permiteduserid}}"/></td>
     </tr>
     <tr>
         <td class="item">Asset Permited Group Id List</td>
-        <td class="value"><input type = "text" name = "permitedgroupid" value="{{asset.permitedgroupid}}"/></td>
+        <td class="value">
+            <select required name="skills" id="skills" class="form-control selectpicker" data-live-search="true" multiple>
+                 {% for group in all_user_groups%}
+                    <option  value="{{group[0]}}">{{group[1]}}</option>
+                 {% endfor %}
+            </select>
+        </td>
     </tr>
     <tr>
         <td class="item">Asset Groups Id List</td>
-        <td class="value"><input type = "text" name = "assetgroups" value="{{asset.assetgroups}}"/></td>
+        <td class="value"><input type = "text" class="form-control" name = "assetgroups" value="{{asset.assetgroups}}"/></td>
     </tr>
     <tr>
         <td class="item">Asset Notes</td>
-        <td class="value"><input type = "text" name = "assetnotes" value="{{asset.assetnotes}}"/></td>
+        <td class="value"><input type = "text" class="form-control" name = "assetnotes" value="{{asset.assetnotes}}"/></td>
     </tr>
 </table>
-    <br>
-<p><input type="button" value="Cancel" onclick="history.back()"><input type = "submit" value = "Submit" /></p>
+     <br>
+        <input type="hidden" name="hidden_skills" id="hidden_skills" value=skills />
+        <input type="button" value="Cancel" class="btn btn-info" onclick="history.back()">
+        <input type="submit" name="submit" class="btn btn-info" value="Submit" />
+
+<!--<p><input type="button" value="Cancel" onclick="history.back()"><input type = "submit" value = "Submit" /></p>-->
 </form>
 </div>
+<script>
+    $(document).ready(function(){
+     $('.selectpicker').selectpicker();
+
+     $('.selectpicker').val([{{this_asset_groups}}]).selectpicker('refresh');
+
+     $('#skills').change(function(){
+      $('#hidden_skills').val($('#skills').val());
+     });
 
 
+     $('#multiple_select_form').on('submit', function(event){
+      event.preventDefault();
+      if($('#skills').val() != '')
+      {
+       $('#hidden_skills').val($('#skills').val());
+       var form_data = $(this).serialize();
+       $.ajax({
+        url:"/assets/{{asset.id}}/assetupdate",
+        method:"POST",
+        data:form_data,
+        success:function(data)
+        {
+         window.location.href = '/assets/{{asset.id}}';
+         //console.log(data);
+         $('#hidden_skills').val('');
+         $('.selectpicker').selectpicker('val', '');
 
-
-
+        }
+       })
+      }
+      else
+      {
+            $.ajax({
+            url: '/assets/create',
+            type: 'post',
+            data: $('#myForm').serialize(),
+            success: function(response) {
+                window.location.href = '/assets/{{asset.id}}';
+            }
+        });
+      }
+     });
+    });
+    </script>
 {% endblock %}

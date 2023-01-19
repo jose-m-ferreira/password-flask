@@ -17,11 +17,11 @@
             </thead>
             <tr>
                 <td class="item">User Name</td>
-                <td class="value"><input type = "text" name = "username" value="{{user.username}}"/></td>
+                <td class="value"><input type = "text" class="form-control" name = "username" value="{{user.username}}"/></td>
             </tr>
             <tr>
                 <td class="item">eMail</td>
-                <td class="value"><input type = "text" name = "email" value="{{user.email}}"/></td>
+                <td class="value"><input type = "email" class="form-control" name = "email" value="{{user.email}}"/></td>
             </tr>
             <tr>
                 <td class="item">User Groups</td>
@@ -35,6 +35,7 @@
              </tr>
         </table>
         <br>
+        <input type="button" value="Cancel" class="btn btn-info" onclick="history.back()">
         <input type="hidden" name="hidden_skills" id="hidden_skills" value=skills />
         <input type="submit" name="submit" class="btn btn-info" value="Submit" />
     </form>
