@@ -31,7 +31,7 @@ def asset_group_list(asset_group_ids):
             print(f"app.py: asset_group iteration: {AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all(), type(AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all())}")
             asset_group_list.append(AssetGroups.query.filter_by(id=assetgroup).with_entities(AssetGroups.assetgroupname).all())
 
-        #print(asset_group_list)
+        print(f"asset_group_list {asset_group_list}")
         return asset_group_list
     else:
         return asset_groups_ids
@@ -46,6 +46,7 @@ def asset_permited_group_list(asset_permited_group_ids):
         if asset_permited_group_ids[0] == 0:
             return asset_permited_group_ids
         for permited_group in asset_permited_group_ids:
+            print(f"app.py 49 / assetpermitedgroupappend {Groups.query.filter_by(id=permited_group).with_entities(Groups.groupname).all()}")
             asset_permited_group_list.append(Groups.query.filter_by(id=permited_group).with_entities(Groups.groupname).all()[0][0])
         return asset_permited_group_list
     else:
@@ -57,17 +58,42 @@ def asset_permited_user_list(asset_permited_user_ids):
         User()
 
         asset_permited_user_ids = list(map(int, asset_permited_user_ids.split(',')))
-        print(f"app.py: asset_permited_user_ids {asset_permited_user_ids, type(asset_permited_user_ids)}")
+        #print(f"app.py: asset_permited_user_ids {asset_permited_user_ids, type(asset_permited_user_ids)}")
 
         asset_permited_user_list = []
         if asset_permited_user_ids != [0]:
             for permited_user in asset_permited_user_ids:
-                print(f"app.py: permited_user: {User.query.filter_by(id=permited_user).with_entities(User.username).all()}")
+                #print(f"app.py: permited_user: {User.query.filter_by(id=permited_user).with_entities(User.username).all()}")
                 asset_permited_user_list.append(
                     User.query.filter_by(id=permited_user).with_entities(User.username).all()[0][0])
             return asset_permited_user_list
     else:
         return asset_permited_user_ids
+
+
+def asset_permited_user_dict(asset_permited_user_ids):
+    if asset_permited_user_ids:
+        from models import User
+        User()
+
+        asset_permited_user_ids = list(map(int, asset_permited_user_ids.split(',')))
+        #print(f"app.py: asset_permited_user_ids {asset_permited_user_ids, type(asset_permited_user_ids)}")
+
+        asset_permited_user_dict = dict()
+        if asset_permited_user_ids != [0]:
+            for permited_user in asset_permited_user_ids:
+                #print(f"app.py: permited_user: {User.query.filter_by(id=permited_user).with_entities(User.id, User.username).all()}")
+                asset_permited_user_dict[permited_user] = User.query.filter_by(id=permited_user).with_entities(User.username).all()[0][0]
+                #asset_permited_user_list.append(User.query.filter_by(id=permited_user).with_entities(User.id, User.username).all()[0][0])
+
+            return asset_permited_user_dict
+    else:
+        asset_permited_user_dict = dict()
+        return asset_permited_user_dict
+
+
+
+
 
 def return_assets_in_assetgroup(assetgroupid, assetgrouplist):
     #print(f"assetgroupid, assetgrouplist: {assetgroupid, assetgrouplist}")

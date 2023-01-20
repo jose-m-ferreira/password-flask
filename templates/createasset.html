@@ -33,12 +33,18 @@
     </tr>
      <tr>
         <td class="item">Asset Permited User Id List</td>
-        <td class="value"><input type = "text" class="form-control" name = "permiteduserid" /></td>
+        <td class="value">
+            <select required name="permited_user_ids" id="permited_user_ids" class="form-control selectpicker" data-live-search="true" multiple>
+                 {% for user in all_users%}
+                    <option  value="{{user[0]}}">{{user[1]}}</option>
+                 {% endfor %}
+            </select>
+        </td>
     </tr>
     <tr>
         <td class="item">Asset Permited Group Id List</td>
         <td class="value">
-            <select required name="skills" id="skills" class="form-control selectpicker" data-live-search="true" multiple>
+           <select required name="skills" id="skills" class="form-control selectpicker" data-live-search="true" multiple>
                  {% for group in all_user_groups%}
                     <option  value="{{group[0]}}">{{group[1]}}</option>
                  {% endfor %}
@@ -47,7 +53,15 @@
     </tr>
     <tr>
         <td class="item">Asset Groups Id List</td>
-        <td class="value"><input type = "text" class="form-control" name = "assetgroups" /></td>
+        <!--<td class="value"><input type = "text" class="form-control" name = "assetgroups" /></td>-->
+         <td class="value">
+             <select required name="form_asset_groups" id="form_asset_groups" class="form-control selectpicker" data-live-search="true" multiple>
+                 {% for assetgroup in assetgroups%}
+                    <option  value="{{assetgroup[0]}}">{{assetgroup[1]}}</option>
+                 {% endfor %}
+            </select>
+
+        </td>
     </tr>
     <tr>
         <td class="item">Asset Notes</td>
@@ -56,6 +70,8 @@
 </table>
     <br>
         <input type="hidden" name="hidden_skills" id="hidden_skills" value=skills />
+        <input type="hidden" name="hidden_form_asset_groups" id="hidden_form_asset_groups" value=form_asset_groups />
+        <input type="hidden" name="hidden_permited_user_ids" id="hidden_permited_user_ids" value=permited_user_ids />
         <input type="button" value="Cancel" class="btn btn-info" onclick="history.back()">
         <input type="submit" name="submit" class="btn btn-info" value="Submit" />
 

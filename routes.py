@@ -32,7 +32,7 @@ from flask_login import (
     login_required,
 )
 
-from app import create_app, db, login_manager, bcrypt, rsa, asset_group_list, asset_permited_group_list, asset_permited_user_list, return_assets_in_assetgroup, return_group_name, return_groupnames
+from app import create_app, db, login_manager, bcrypt, rsa, asset_group_list, asset_permited_group_list, asset_permited_user_list, return_assets_in_assetgroup, return_group_name, return_groupnames, asset_permited_user_dict
 from models import User, Groups, Asset, AssetGroups
 from forms import login_form, register_form, self_update_form, search_form
 from rsa_key_management import loadSecrets
@@ -148,7 +148,7 @@ def mypasswords():
         userid = current_user.id
         userGroupId = list(map(int,current_user.usergroupid.split(',')))
 
-        all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid).all()
+        all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid, Asset.assetdescription, Asset.assetnotes).all()
         #print(userid, userGroupId)
         #print(all_assets)
         user_assets = []
@@ -163,10 +163,10 @@ def mypasswords():
                     user_assets.append(all_assets[i])
         user_group_assets = []
         for i in range(0, len(all_assets)):
-            print(f"{all_assets[i][6]} - {all_assets[i]}")
+            #print(f"{all_assets[i][6]} - {all_assets[i]}")
 
-            print(f"list of user groupids user belongs to: {userGroupId}")
-            print(f"Asset permited user group ids: {(all_assets[i][6].split(',')[0]), type(all_assets[i][6].split(',')[0]), len(all_assets[i][6].split(',')[0])}")
+            #print(f"list of user groupids user belongs to: {userGroupId}")
+            #print(f"Asset permited user group ids: {(all_assets[i][6].split(',')[0]), type(all_assets[i][6].split(',')[0]), len(all_assets[i][6].split(',')[0])}")
 
             #if any(userGroupId) in any((list(map(int, all_assets[i][6].split(','))))):
 
@@ -477,12 +477,16 @@ def RetrieveAssetList():
 def create_asset():
     if request.method == 'GET':
         all_user_groups = return_groupnames()
-        this_asset_groups = Asset.assetgroups
+        this_asset_groups = Asset.permitedgroupid
+        all_users = User.query.with_entities(User.id, User.username).all()
+        this_asset_permited_users = Asset.permiteduserid
         assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-        return render_template('createasset.html', assetgroups=assetgroups, all_user_groups=all_user_groups, this_asset_groups=this_asset_groups)
+        this_assets_assetgroups = Asset.assetgroups
+        print(f"all_users: {all_users}")
+        return render_template('createasset.html', assetgroups=assetgroups, all_user_groups=all_user_groups, this_asset_groups=this_asset_groups, all_users=all_users)
 
     if request.method == 'POST':
-        print(f"skills: {request.form.getlist('skills')}")
+        print(f"asset create post skills: {request.form.getlist('skills')} form_asset_groups: {request.form.getlist('form_asset_groups')} permited_user_ids: {request.form.getlist('permited_user_ids')}")
         #id = request.form['id']
         assetname = request.form['assetname']
         assetdescription = request.form['assetdescription']
@@ -491,15 +495,16 @@ def create_asset():
         assetuser = request.form['assetuser']
         assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey).hex()
         print(f"assetpwd: {assetpwd, type(assetpwd)}")
-        permiteduserid = request.form['permiteduserid']
+        permiteduserid = ','.join(request.form.getlist('permited_user_ids'))
         if not permiteduserid:
             permiteduserid = str(current_user.id)
         permitedgroupid = ','.join(request.form.getlist('skills'))
-        assetgroups = request.form['assetgroups']
+        #assetgroups = request.form['assetgroups']
+        assetgroups = ','.join(request.form.getlist('form_asset_groups'))
 
         asset = Asset(assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
-                      permitedgroupid=permitedgroupid, assetnotes=assetnotes)
+                      permitedgroupid=permitedgroupid, assetgroups=assetgroups, assetnotes=assetnotes)
         try:
             db.session.add(asset)
             db.session.commit()
@@ -560,6 +565,7 @@ def RetrieveSingleAsset(id):
                 asset_permited_users = asset_permited_user_list(asset.permiteduserid)
 
             assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+            print(f"assetgroups {assetgroups}")
             return render_template('asset.html', asset=asset, assetgroups=assetgroups, asset_group_names=asset_group_names, asset_permited_groups=asset_permited_groups, asset_permited_users=asset_permited_users)
         return f"Asset with id ={id} Doesnt exist"
     else:
@@ -572,7 +578,11 @@ def RetrieveSingleAsset(id):
 def updateasset(id):
     all_user_groups = return_groupnames()
     this_asset_groups = Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0]
-    print(f"this_asset_groups:  {this_asset_groups}")
+    all_users = User.query.with_entities(User.id, User.username).all()
+    this_asset_permited_users = Asset.permiteduserid
+    assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+    this_assets_assetgroups = Asset.query.filter_by(id=id).with_entities(Asset.assetgroups)[0][0]
+    print(f"this_assets_assetgroups:  {this_assets_assetgroups}")
     userid = current_user.id
     userGroupId = list(map(int, current_user.usergroupid.split(',')))
     print(f"575 {Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0]}")
@@ -590,10 +600,13 @@ def updateasset(id):
         asset = Asset.query.filter_by(id=id).first()
         asset.assetpwd = rsa.decrypt(bytes.fromhex(asset.assetpwd), privateKey).decode()
         if request.method == 'POST':
+            print(
+                f"asset update skills: {request.form.getlist('skills')} form_asset_groups: {request.form.getlist('form_asset_groups')} permited_user_ids: {request.form.getlist('permited_user_ids')}")
+
             if asset:
                 db.session.delete(asset)
                 db.session.commit()
-
+                print(f"asset delete?: {asset}")
                 assetname = request.form['assetname']
                 assetdescription = request.form['assetdescription']
                 assetnotes = request.form['assetnotes']
@@ -601,19 +614,18 @@ def updateasset(id):
                 assetuser = request.form['assetuser']
                 assetpwd = rsa.encrypt(request.form['assetpwd'].encode('utf-8'), publicKey).hex()
 
-                permiteduserid = request.form['permiteduserid']
-                if not permiteduserid:
-                    permiteduserid = str(current_user.id)
-
+                permiteduserid = ','.join(request.form.getlist('permited_user_ids'))
                 permitedgroupid = ','.join(request.form.getlist('skills'))
-                if not permitedgroupid:
-                    permitedgroupid ='0'
-                assetgroups = request.form['assetgroups']
-                if not assetgroups:
-                    assetgroups = ''
+                assetgroups = ','.join(request.form.getlist('form_asset_groups'))
+
+
+                #print(f"id={id}, assetname={assetname}, assetdescription={assetdescription}, assetipaddress={assetipaddress},\
+                #      assetuser={assetuser},assetpwd={assetpwd}, permiteduserid={permiteduserid},\
+                #      permitedgroupid={permitedgroupid}, assetgroups={assetgroups}, assetnotes={assetnotes}")
                 asset = Asset(id=id, assetname=assetname, assetdescription=assetdescription, assetipaddress=assetipaddress,
                       assetuser=assetuser,assetpwd=assetpwd, permiteduserid=permiteduserid,
                       permitedgroupid=permitedgroupid, assetgroups=assetgroups, assetnotes=assetnotes)
+                print(f"asset create? {asset.assetgroups}")
 
                 db.session.add(asset)
                 db.session.commit()
@@ -621,7 +633,10 @@ def updateasset(id):
             else:
                 return f"Asset with id = {id} Does not exist"
         assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-        return render_template('assetupdate.html', asset=asset, assetgroups=assetgroups, all_user_groups=all_user_groups, this_asset_groups=this_asset_groups)
+        return render_template('assetupdate.html', asset=asset, assetgroups=assetgroups,
+                               this_assets_assetgroups=this_assets_assetgroups,all_user_groups=all_user_groups,
+                               this_asset_groups=this_asset_groups, all_users=all_users,
+                               this_asset_permited_users=this_asset_permited_users )
     else:
         return f"No permissions to edit asset with id = {id}"
 
@@ -682,13 +697,13 @@ def search():
                 asset_permited_users = list(map(int, all_assets[i][5].split(',')))
                 if userid in (list(map(int, all_assets[i][5].split(',')))):
                     user_assets.append(all_assets[i])
-        #print(f"routes.py - user_assets 678 {user_assets}")
+        print(f"routes.py - user_assets 698 {user_assets}")
         user_group_assets = []
         for i in range(0, len(all_assets)):
             print(f"routes.py - /search i: {i}")
             for ugid in userGroupId:
-                print(f"{ugid} - all_assets[i][6].split(',') {all_assets[i][6].split(',')}")
-                #if ugid in list(map(int, all_assets[i][6].split(','))):
+                print(f"ugid: {ugid} - all_assets[i][6].split(',') {all_assets[i][6]}")
+
                 if ugid in list(map(int, all_assets[i][6].split(','))):
                     print(f"all_assets[i] {all_assets[i]}")
                     user_group_assets.append(all_assets[i])

@@ -35,12 +35,18 @@
     </tr>
     <tr>
         <td class="item">Asset Permited User Id List</td>
-        <td class="value"><input type = "text" class="form-control" name = "permiteduserid" value="{{asset.permiteduserid}}"/></td>
+        <td class="value">
+            <select required name="permited_user_ids" id="permited_user_ids_picker" class="form-control selectpicker" data-live-search="true" multiple>
+                 {% for user in all_users%}
+                    <option  value="{{user[0]}}">{{user[1]}}</option>
+                 {% endfor %}
+            </select>
+        </td>
     </tr>
     <tr>
         <td class="item">Asset Permited Group Id List</td>
         <td class="value">
-            <select required name="skills" id="skills" class="form-control selectpicker" data-live-search="true" multiple>
+            <select required name="skills" id="skills_picker" class="form-control selectpicker" data-live-search="true" multiple>
                  {% for group in all_user_groups%}
                     <option  value="{{group[0]}}">{{group[1]}}</option>
                  {% endfor %}
@@ -49,7 +55,13 @@
     </tr>
     <tr>
         <td class="item">Asset Groups Id List</td>
-        <td class="value"><input type = "text" class="form-control" name = "assetgroups" value="{{asset.assetgroups}}"/></td>
+        <td class="value">
+            <select required name="form_asset_groups" id="form_asset_groups" class="form-control selectpicker" data-live-search="true" multiple>
+                 {% for assetgroup in assetgroups%}
+                    <option  value="{{assetgroup[0]}}">{{assetgroup[1]}}</option>
+                 {% endfor %}
+            </select>
+        </td>
     </tr>
     <tr>
         <td class="item">Asset Notes</td>
@@ -69,6 +81,7 @@
      $('.selectpicker').selectpicker();
 
      $('.selectpicker').val([{{this_asset_groups}}]).selectpicker('refresh');
+     $('.selectpicker').val([{{this_assets_assetgroups}}]).selectpicker('refresh');
 
      $('#skills').change(function(){
       $('#hidden_skills').val($('#skills').val());
