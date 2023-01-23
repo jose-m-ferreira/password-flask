@@ -1,5 +1,8 @@
 from app import db
 from flask_login import UserMixin
+import datetime
+from sqlalchemy import Column, Integer, DateTime
+
 
 class User(UserMixin, db.Model):
     __tablename__ = "user"
@@ -50,3 +53,12 @@ class AssetGroups(db.Model):
 
     def __repr__(self):
         return f"{self.assetgroupname}"
+
+
+class Audit(db.Model):
+    __tablename__ = "auditing"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    userid = db.Column(db.Integer,  unique=False, nullable=False)
+    assetid = db.Column(db.Integer,  unique=False, nullable=False)
+    created_date = db.Column(DateTime, default=datetime.datetime.utcnow)
+    method = db.Column(db.String(80), unique=False, nullable=False)

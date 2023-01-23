@@ -75,6 +75,9 @@
 
 <!--<p><input type="button" value="Cancel" onclick="history.back()"><input type = "submit" value = "Submit" /></p>-->
 </form>
+    this_asset_groups: {{this_asset_groups}}
+    this_assets_assetgroups: {{this_assets_assetgroups}}
+    this_asset_permited_users: {{this_asset_permited_users}}
 </div>
 <script>
     $(document).ready(function(){
@@ -82,6 +85,7 @@
 
      $('.selectpicker').val([{{this_asset_groups}}]).selectpicker('refresh');
      $('.selectpicker').val([{{this_assets_assetgroups}}]).selectpicker('refresh');
+     $('.selectpicker').val([{{this_asset_permited_users}}]).selectpicker('refresh');
 
      $('#skills').change(function(){
       $('#hidden_skills').val($('#skills').val());

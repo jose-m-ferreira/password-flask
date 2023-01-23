@@ -33,7 +33,7 @@ from flask_login import (
 )
 
 from app import create_app, db, login_manager, bcrypt, rsa, asset_group_list, asset_permited_group_list, asset_permited_user_list, return_assets_in_assetgroup, return_group_name, return_groupnames, asset_permited_user_dict
-from models import User, Groups, Asset, AssetGroups
+from models import User, Groups, Asset, AssetGroups, Audit
 from forms import login_form, register_form, self_update_form, search_form
 from rsa_key_management import loadSecrets
 from load_groups import insert_group_data
@@ -564,9 +564,20 @@ def RetrieveSingleAsset(id):
                 print(f"asset.permiteduserid {asset.permiteduserid}")
                 asset_permited_users = asset_permited_user_list(asset.permiteduserid)
 
+            db.session.close()
+            #audit user -- this route method is view
+            userid = current_user.id
+            assetid = id
+            method = 'view'
+            audit = Audit(userid=userid, assetid=assetid, method=method)
+            db.session.add(audit)
+            db.session.commit()
+
+            audit = Audit.query.filter_by(assetid=id).with_entities(Audit.id, Audit.userid, Audit.assetid, Audit.method,
+                                              Audit.created_date).order_by(Audit.created_date.desc()).limit(100)
             assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
-            print(f"assetgroups {assetgroups}")
-            return render_template('asset.html', asset=asset, assetgroups=assetgroups, asset_group_names=asset_group_names, asset_permited_groups=asset_permited_groups, asset_permited_users=asset_permited_users)
+            #rint(f"assetgroups {assetgroups}")
+            return render_template('asset.html', asset=asset, assetgroups=assetgroups, asset_group_names=asset_group_names, asset_permited_groups=asset_permited_groups, asset_permited_users=asset_permited_users, audit=audit)
         return f"Asset with id ={id} Doesnt exist"
     else:
         return f"No permissions to view asset with id = {id}"
@@ -576,10 +587,20 @@ def RetrieveSingleAsset(id):
 @app.route('/assets/<int:id>/assetupdate', methods=['GET', 'POST'])
 @login_required
 def updateasset(id):
+    db.session.close()
+    # audit user -- this route method is view
+    userid = current_user.id
+    assetid = id
+    method = 'update'
+    audit = Audit(userid=userid, assetid=assetid, method=method)
+    db.session.add(audit)
+    db.session.commit()
+    db.session.close()
+
     all_user_groups = return_groupnames()
     this_asset_groups = Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0]
     all_users = User.query.with_entities(User.id, User.username).all()
-    this_asset_permited_users = Asset.permiteduserid
+    this_asset_permited_users = Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0]
     assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
     this_assets_assetgroups = Asset.query.filter_by(id=id).with_entities(Asset.assetgroups)[0][0]
     print(f"this_assets_assetgroups:  {this_assets_assetgroups}")
@@ -599,6 +620,7 @@ def updateasset(id):
     if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
         asset = Asset.query.filter_by(id=id).first()
         asset.assetpwd = rsa.decrypt(bytes.fromhex(asset.assetpwd), privateKey).decode()
+
         if request.method == 'POST':
             print(
                 f"asset update skills: {request.form.getlist('skills')} form_asset_groups: {request.form.getlist('form_asset_groups')} permited_user_ids: {request.form.getlist('permited_user_ids')}")
@@ -757,6 +779,12 @@ def search():
                            btn_action="Search Assets", assetgroups=assetgroups)
 
 
+@app.route("/audit", methods=['GET'])
+@login_required
+def show_audit_log():
+    audit = Audit.query.with_entities(Audit.id, Audit.userid, Audit.assetid, Audit.method, Audit.created_date).order_by(Audit.created_date.desc()).limit(100)
+    assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
+    return render_template('show_audit_log.html', audit=audit, assetgroups=assetgroups)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -15,7 +15,8 @@
             <h1>Welcome {{ current_user.username }}</h1>
             <hr>
             <a href="/mypasswords">my Passwords</a><br>
-            <a href="/assets/create">Add an Asset</a>
+            <a href="/assets/create">Add an Asset</a><br>
+            <a href="/audit">View Audit Log</a>
                 {% if 1 in current_user.usergroupid.split(',') | map('int') | list %}
                 <hr>
                       Welcome Password Admin

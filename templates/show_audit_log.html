@@ -1,0 +1,29 @@
+{% extends "mypassword_base.html" %}
+{% block title%} {{ title }} {% endblock %}
+{% block content%}
+
+<div class="container py-4 text-center" >
+
+<TABLE align="center" border 1 id="assets">
+
+        <thead>
+    <tr>
+        <th class="Audit ID">Audit ID</th>
+        <th class="Audit ID">User ID</th>
+        <th class="Asset ID">Asset ID</th>
+        <th class="Asset ID">Time Stamp</th>
+        <th class="Asset ID">Edit/View</th>
+    </tr>
+    </thead>
+    {% for item in audit %}
+    <TR>
+        <TD class="Asset ID">{{item.id}}</td>
+        <TD class="Asset ID">{{item.userid}}</td>
+        <TD class="Asset ID">{{item.assetid}}</td>
+        <TD class="Asset ID">{{item.created_date}}</td>
+        <TD class="Asset ID">{{item.method}}</td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+{% endblock %}
