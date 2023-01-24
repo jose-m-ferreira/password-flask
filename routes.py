@@ -198,9 +198,19 @@ def mypasswords_assetgroups(id):
         userid = current_user.id
         print(f"current_user.usergroupid {current_user.usergroupid}")
         userGroupId = list(map(int, current_user.usergroupid.split(',')))
+        print(f"assetgroup id : {id}")
+        every_asset = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid, Asset.assetgroups).all()
+        #all_assets = Asset.query.filter_by(assetgroups=id).with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid, Asset.assetgroups).all()
+        all_assets = []
+        for each in every_asset:
+            print(f"id: {id} each asset.assetgroups: {each.assetgroups.split(',')}")
+            if each.assetgroups.split(',')[0]:
+                agroups = list(map(int, each.assetgroups.split(',')))
+                print(f"agroups {agroups}")
+                if id in agroups:
+                    all_assets.append(each)
 
-        all_assets = Asset.query.filter_by(assetgroups=id).with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser,
-                                               Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid, Asset.assetgroups).all()
+        print(f"all_assets {all_assets}")
         print(f"routes.py /search: userid:  {userid}, userGroupId: {userGroupId}")
         # for asset in all_assets:
         # print(f"routes.py /search: all_assets: {asset}")

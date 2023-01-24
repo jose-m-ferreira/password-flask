@@ -137,8 +137,8 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
-    from load_ITServices import synch_itservices_to_assetgroups
-    synch_itservices_to_assetgroups()
+    #from load_ITServices import synch_itservices_to_assetgroups
+    #synch_itservices_to_assetgroups()
     return app
 
 def __init__():
