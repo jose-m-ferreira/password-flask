@@ -7,8 +7,5 @@
 /public.pem
 /migrations/
 /migrations/
-/load_ITServices.py
-/loadAlchemy.py
-/importSecrets.py
 /templates/assetupdate_backup.html
 /templates/createasset_backup.html
