@@ -706,11 +706,11 @@ def search():
     if current_user.is_authenticated:
         user = current_user.username
         userid = current_user.id
-        print(f"current_user.usergroupid {current_user.usergroupid}")
+        #print(f"current_user.usergroupid {current_user.usergroupid}")
         userGroupId = list(map(int, current_user.usergroupid.split(',')))
         all_assets = Asset.query.with_entities(Asset.id, Asset.assetname, Asset.assetipaddress, Asset.assetuser, Asset.assetpwd, Asset.permiteduserid, Asset.permitedgroupid, Asset.assetnotes, Asset.assetdescription).all()
 
-        print(f"routes.py /search: userid:  {userid}, userGroupId: {userGroupId}")
+        #print(f"routes.py /search: userid:  {userid}, userGroupId: {userGroupId}")
         #for asset in all_assets:
             #print(f"routes.py /search: all_assets: {asset}")
         user_assets = []
@@ -719,17 +719,17 @@ def search():
                 asset_permited_users = list(map(int, all_assets[i][5].split(',')))
                 if userid in (list(map(int, all_assets[i][5].split(',')))):
                     user_assets.append(all_assets[i])
-        print(f"routes.py - user_assets 698 {user_assets}")
+        #print(f"routes.py - user_assets 698 {user_assets}")
         user_group_assets = []
         for i in range(0, len(all_assets)):
-            print(f"routes.py - /search i: {i}")
+            #print(f"routes.py - /search i: {i}")
             for ugid in userGroupId:
                 print(f"ugid: {ugid} - all_assets[i][6].split(',') {all_assets[i][6]}")
 
                 if ugid in list(map(int, all_assets[i][6].split(','))):
-                    print(f"all_assets[i] {all_assets[i]}")
+                    #print(f"all_assets[i] {all_assets[i]}")
                     user_group_assets.append(all_assets[i])
-        print(f"routes.py - user_group_assets 687 {user_group_assets}")
+        #print(f"routes.py - user_group_assets 687 {user_group_assets}")
 
 
         user_assets = list(dict.fromkeys(user_assets))
@@ -740,7 +740,7 @@ def search():
         #print(f"all_assets: {all_assets} - {type(all_assets)}")
         if form.validate_on_submit():
             try:
-                search_item = form.search_item.data
+                search_item = form.search_item.data.lower()
                 if not all_assets:
                     flash(f"No Assets found for {search_item}", "search_empty_result")
                     assetgroups = AssetGroups.query.with_entities(AssetGroups.id, AssetGroups.assetgroupname).all()
@@ -753,7 +753,7 @@ def search():
                         #print(f"item: {item, type(item)}")
                         for sub_item in list(item):
                             #print(f"{search_item} - {sub_item, type(sub_item)}")
-                            if search_item in str(sub_item):
+                            if search_item in str(sub_item).lower():
                                 search_results.append(item)
                     #print(f"search_results: {search_results}")
                     if search_results:
