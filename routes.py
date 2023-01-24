@@ -664,29 +664,29 @@ def updateasset(id):
 
 
 #delete the asset
-@app.route('/assets/<int:id>/delete', methods=['GET'])
-@login_required
-def deleteasset(id):
-    userid = current_user.id
-    userGroupId = list(map(int, current_user.usergroupid.split(',')))
-
-    asset_permited_users = list(
-        map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
-    asset_permited_groups = list(
-        map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
-
-    if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
-        asset = Asset.query.filter_by(id=id).first()
-        if request.method == 'GET':
-            if asset:
-                db.session.delete(asset)
-                db.session.commit()
-            else:
-                return f"Asset with id = {id} Does not exist"
-
-        return redirect('/assets')
-    else:
-        return f"No permissions to delete asset with id: {id}"
+#@app.route('/assets/<int:id>/delete', methods=['GET'])
+#@login_required
+#def deleteasset(id):
+#    userid = current_user.id
+#    userGroupId = list(map(int, current_user.usergroupid.split(',')))
+#
+#    asset_permited_users = list(
+#        map(int, Asset.query.filter_by(id=id).with_entities(Asset.permiteduserid)[0][0].split(',')))
+#    asset_permited_groups = list(
+#        map(int, Asset.query.filter_by(id=id).with_entities(Asset.permitedgroupid)[0][0].split(',')))
+#
+#    if userid in asset_permited_users or (set(userGroupId).intersection(asset_permited_groups)):
+#        asset = Asset.query.filter_by(id=id).first()
+#        if request.method == 'GET':
+#            if asset:
+#                db.session.delete(asset)
+#                db.session.commit()
+#            else:
+#                return f"Asset with id = {id} Does not exist"
+#
+#        return redirect('/assets')
+#    else:
+#        return f"No permissions to delete asset with id: {id}"
 
 #list the searched assets
 @app.route("/search_results/<query>", methods=['GET', 'POST'])
