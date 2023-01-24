@@ -118,5 +118,5 @@ CMD [ "gunicorn",  "wsgi:app", "-b 0.0.0.0:8080", "--reload" ]
 
 
 
-##Mentions and Credits
+### 6. Mentions and Credits
 the basic authentication for this app was inspired by https://github.com/Dev-Elie and his User-Authentication-in-Flask
