@@ -49,21 +49,24 @@ pip install -r requirements.txt
 
 ### 5. Run the application 
 
-**For linux and macOS**
-Make the run file executable by running the code
+python wsgi.py
 
-```chmod 777 run```
 
-Then start the application by executing the run file
+for production, we install uvicorn and gunicorn and packaged it up using docker with the following docker file:
+# syntax=docker/dockerfile:1
 
-```./run```
+FROM centos/python-36-centos7
 
-**On windows**
-```
-set FLASK_APP=routes
-flask run
-```
+WORKDIR /app
 
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
+
+COPY . .
+
+#CMD [ "python3", "-m" , "wsgi", "run", "--host=0.0.0.0"]
+EXPOSE 8080
+CMD [ "gunicorn",  "wsgi:app", "-b 0.0.0.0:8080", "--reload" ]
 
 
 
