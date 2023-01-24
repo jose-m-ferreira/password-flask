@@ -1,6 +1,6 @@
 # password-flask
 
-## Notes:
+
  
 This is a password safe, written in python, templated and served using flask, and done as a learning excercise for myself; there is  room for great improvement.
 
@@ -118,5 +118,5 @@ CMD [ "gunicorn",  "wsgi:app", "-b 0.0.0.0:8080", "--reload" ]
 
 
 
-### 6. Mentions and Credits
+## Mentions and Credits
 the basic authentication for this app was inspired by https://github.com/Dev-Elie and his User-Authentication-in-Flask
