@@ -41,13 +41,15 @@ These secrets can only be viewed with the private.pem.  If you corrupt or lose t
 
 these keys are the trick to the safekeeping of your password secrets in your database, so take good care of them and do not expose them.
 
-TODO:
+##TODO:
 1) create assetgroup interface;   assetgroups are how secrets are grouped according to type ( asset types or however you group alike assets)
       Esentially I wrote this so that this information, is fed from our CMDB, so that part I'm leaving out of this project for  now (24/01/2023)
 
 2) test password encryption for > 512 keylength. should be fairly easy to do, as the db.column type for Asset.assetpwd is Text.
 
 3) see of a means to have the password keys stored in an encrypted database....or something that would leave the public.pem and private.pem so fragile
+
+4) fix up the tables; maybe move some columns to modals to keep the tables from scrolling off screen
 
 ## Set up & Installation.
 
